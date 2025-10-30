@@ -20,6 +20,7 @@ import components.DateInput
 import components.TextArea
 import components.TextInput
 import components.TimeInput
+import components.cards.CardContainer
 import layout.Layout
 import java.time.LocalDate
 
@@ -86,6 +87,7 @@ fun HomeScreen(navController: NavHostController){
             )
             TimeInput()
             DateInput(onDate = {newDate -> date = newDate}, date = date)
+            CardContainer {  }
         })
 }
 
