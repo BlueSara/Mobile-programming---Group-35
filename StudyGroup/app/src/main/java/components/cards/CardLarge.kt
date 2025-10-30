@@ -40,7 +40,7 @@ fun CardLarge(post: Map<String, Any> ?= null){
             modifier = Modifier
                 .background(colors.info)
                 .fillMaxWidth()
-                .padding(space.s),
+                .padding(horizontal = space.s, vertical = space.m),
             verticalAlignment = Alignment.Bottom
         ) {
             Text(text = "${data["subjectCode"]}", fontWeight = FontWeight.Bold, fontSize = 20.sp)
