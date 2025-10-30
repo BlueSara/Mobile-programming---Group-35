@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.studygroup.ui.theme.StudyGroupTheme
 import components.TextArea
 import components.TextInput
+import components.TimeInput
 import layout.Layout
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +60,7 @@ fun HomeScreen(navController: NavHostController){
 
     Layout(
         navController = navController,
-        arrowBack = true,
+        arrowBack = false,
         content = {
             SomeComp(title = "Home page")
             TextInput(
@@ -79,6 +80,7 @@ fun HomeScreen(navController: NavHostController){
                 value = description,
                 onChange = { newVal -> description = newVal },
             )
+            TimeInput()
         })
 }
 
