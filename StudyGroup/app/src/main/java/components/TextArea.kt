@@ -35,12 +35,12 @@ import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
 @Composable
-fun TextInput(value: String = "",
+fun TextArea(value: String = "",
               onChange: ((String) -> Unit)? = null,
               onFocus:(() -> Unit)? = null,
               onBlur: (() -> Unit)? = null,
               label: String = "<label>",
-              maxLength: Int = 30
+              maxLength: Int = 150
 ){
     val colors = LocalCustomColors.current
     val space = LocalSpacing.current
@@ -52,12 +52,13 @@ fun TextInput(value: String = "",
         modifier = Modifier
             .padding(bottom = space.m)
         ,
-        verticalArrangement = Arrangement.spacedBy(space.xs)
+        verticalArrangement = Arrangement.spacedBy(space.xs),
+        horizontalAlignment = Alignment.Start
     ){
         Text(label, fontSize = 20.sp)
-        Row (
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(space.xs),
+        Column (
+            verticalArrangement = Arrangement.spacedBy(space.xs),
+            horizontalAlignment = Alignment.End,
             modifier = Modifier
                 .drawBehind{
                     val strokeWidth = 2.sp.toPx()
@@ -78,13 +79,13 @@ fun TextInput(value: String = "",
                 state = state,
                 textStyle = LocalTextStyle.current.copy(fontSize = 18.sp),
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxWidth()
                     .onFocusChanged{state ->
                         if (!state.isFocused && focused) onBlur?.invoke()
                         if (!focused && state.isFocused) onFocus?.invoke()
                         focused = state.isFocused
                     }
-                    .height(space.xl)
+                    .height(space.xl * 3)
                     .background(colors.background)
                     .padding(space.xs)
                 ,
@@ -103,7 +104,7 @@ fun TextInput(value: String = "",
                 modifier = Modifier
                     .padding(bottom = space.xs, end = space.xs)
                     .background(colors.background)
-                )
+            )
         }
 
         LaunchedEffect(state) {
@@ -117,6 +118,6 @@ fun TextInput(value: String = "",
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewTextInput(){
-    TextInput(value = "Some value")
+fun PreviewTextArea(){
+    TextArea(value = "Some value")
 }
