@@ -21,6 +21,7 @@ import components.TextArea
 import components.TextInput
 import components.TimeInput
 import components.cards.CardContainer
+import components.cards.CardLarge
 import layout.Layout
 import java.time.LocalDate
 
@@ -67,7 +68,7 @@ fun HomeScreen(navController: NavHostController){
         navController = navController,
         arrowBack = false,
         content = {
-            SomeComp(title = "Home page")
+            /*
             TextInput(
                 label = "First name",
                 value = firstname,
@@ -86,8 +87,8 @@ fun HomeScreen(navController: NavHostController){
                 onChange = { newVal -> description = newVal },
             )
             TimeInput()
-            DateInput(onDate = {newDate -> date = newDate}, date = date)
-            CardContainer {  }
+            DateInput(onDate = {newDate -> date = newDate}, date = date)*/
+            CardLarge()
         })
 }
 

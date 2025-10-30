@@ -23,20 +23,20 @@ fun CardContainer(content :(@Composable (() ->Unit))? = null){
 
     Box(
         modifier = Modifier
-            .border(width= 0.dp, colors.borderColor, shape = RoundedCornerShape(4.dp))
+            .border(width= 0.dp, colors.borderColor, shape = RoundedCornerShape(8.dp))
             .defaultMinSize( minHeight = space.xl)
             .fillMaxWidth()
             .shadow(
                 elevation = space.xs / 2,
-                shape = RoundedCornerShape(4.dp),
+                shape = RoundedCornerShape(8.dp),
                 clip= false,
                 spotColor = colors.grey
             )
-            .clip(RoundedCornerShape(4.dp))
+            .clip(RoundedCornerShape(8.dp))
     ){
         Column(
             modifier = Modifier
-                .border(width= 2.dp, colors.borderColor, shape = RoundedCornerShape(4.dp))
+                .border(width= 2.dp, colors.borderColor, shape = RoundedCornerShape(8.dp))
                 .background(colors.background)
                 .defaultMinSize( minHeight = space.xl)
                 .fillMaxWidth()
