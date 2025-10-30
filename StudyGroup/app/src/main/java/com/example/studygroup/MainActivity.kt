@@ -16,10 +16,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.studygroup.ui.theme.StudyGroupTheme
+import components.DateInput
 import components.TextArea
 import components.TextInput
 import components.TimeInput
 import layout.Layout
+import java.time.LocalDate
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +60,7 @@ fun HomeScreen(navController: NavHostController){
     var firstname by remember { mutableStateOf("John") }
     var lastname by remember { mutableStateOf("Doe") }
     var description by remember { mutableStateOf("Doe") }
+    var date by remember { mutableStateOf(LocalDate.now()) }
 
     Layout(
         navController = navController,
@@ -81,6 +85,7 @@ fun HomeScreen(navController: NavHostController){
                 onChange = { newVal -> description = newVal },
             )
             TimeInput()
+            DateInput(onDate = {newDate -> date = newDate}, date = date)
         })
 }
 
