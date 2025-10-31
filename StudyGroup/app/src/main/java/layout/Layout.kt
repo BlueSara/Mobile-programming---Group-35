@@ -25,7 +25,7 @@ fun Layout(
     arrowBack: Boolean = false,
     showFilter: Boolean = false,
     onFilter: (() -> Unit)? = null,
-    pageInfo: (@Composable (() -> Unit))? = null,
+    pageDetails: (@Composable (() -> Unit))? = null,
     content: (@Composable (() -> Unit))? = null,
     footer: (@Composable (() -> Unit))? = null,
 ) {
@@ -44,7 +44,7 @@ fun Layout(
     val showMenu = rememberSaveable { mutableStateOf(value=false) }
 
     //main container, containing all content
-        Column(modifier = Modifier
+    Column(modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .background(colors.foreground)
@@ -71,8 +71,8 @@ fun Layout(
                     .fillMaxWidth()
                     .fillMaxHeight()
                 ){
-                    if (pageInfo != null) {
-                        pageInfo()
+                    if (pageDetails != null) {
+                        pageDetails()
                     }
 
                     //container for all main-content of the page
