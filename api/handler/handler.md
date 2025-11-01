@@ -1,0 +1,1 @@
+This folder is for handler functions, e.g. functions that are called by routes, and calls middleware before it initializes and continues with controller at the end.

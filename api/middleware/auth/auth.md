@@ -1,0 +1,1 @@
+This folder is for the authentication of users, e.g. logics to verify a users access/refreshToken and return user info as struct.

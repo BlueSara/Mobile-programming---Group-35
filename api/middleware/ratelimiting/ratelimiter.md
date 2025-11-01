@@ -1,0 +1,1 @@
+This folder is for rate-limiting, e.g. the function amounts of request allowed per x time.

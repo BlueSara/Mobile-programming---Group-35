@@ -1,0 +1,2 @@
+This folder is service functions, e.g. functions that handle logics such as for example db CRUD operations, or other functionalitities. Functions in this directory are utilized in  controller functions.  
+Should contain multiple files, each file relevant to its "purpose"
