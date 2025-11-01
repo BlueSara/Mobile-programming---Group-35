@@ -1,6 +1,8 @@
 package components
 
 import android.view.MotionEvent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -130,11 +132,89 @@ fun AppButton(
 @Preview(showBackground = true)
 @Composable
 fun PreviewAppButton() {
-    Row {
-        AppButton(
-            type = ButtonType.INFO,
-            text = "Click Please",
-            modifier = Modifier.weight(1f)
-        )
+    val space = LocalSpacing.current
+    Column (
+        verticalArrangement = Arrangement.spacedBy(space = space.xs)
+
+    ){
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(space.xs)
+        ){
+            AppButton(
+                type = ButtonType.PRIMARY,
+                text = "Primary",
+                onClick = { },
+                modifier = Modifier.weight(1f),
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ){
+            AppButton(
+                type = ButtonType.DANGER,
+                text = "Danger",
+                onClick = { }
+            )}
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            AppButton(
+                type = ButtonType.SUCCESS,
+                text = "Success",
+                onClick = { }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            AppButton(
+                type = ButtonType.INFO,
+                text = "Info",
+                onClick = { }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            AppButton(
+                type = ButtonType.PRIMARYACTIVE,
+                text = "Primary Active",
+                onClick = { }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            AppButton(
+                type = ButtonType.DANGERACTIVE,
+                text = "Danger Active",
+                onClick = { }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            AppButton(
+                type = ButtonType.SUCCESSACTIVE,
+                text = "Success Active",
+                onClick = { }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            AppButton(
+                type = ButtonType.INFOACTIVE,
+                text = "Info Active",
+                onClick = { }
+            )
+        }
     }
 }
