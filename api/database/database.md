@@ -1,0 +1,1 @@
+This folder is for the db, e.g. struct and function to establish database connectivity.

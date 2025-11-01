@@ -1,0 +1,1 @@
+This folder is for holding routes in the api, and calls the relevant handler function for each route before handler initializes the controller which handles business logic.
