@@ -1,8 +1,5 @@
 package components
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,9 +69,9 @@ fun Select(
             modifier = Modifier
                 .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
         ) {
-            options.forEach { university ->
-                val name = university["name"]
-                val id = university["id"]
+            options.forEach { option ->
+                val name = option["name"]
+                val id = option["id"]
 
                 // we should only display non-broken data, where we have both an id and a name
                 if (name != null && id != null) {
