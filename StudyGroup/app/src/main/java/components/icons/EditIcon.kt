@@ -8,30 +8,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.studygroup.R
-import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
+import com.example.studygroup.ui.theme.LocalCustomColors
 
 
 /**
  * EditIcon
  */
 @Composable
-fun EditIcon(
-    modifier: Modifier = Modifier,
-    tint: Color = Color.Unspecified,
-    size: Dp = 24.dp
-){
+fun EditIcon(){
+    val colors = LocalCustomColors.current
     Icon(
         painter = painterResource(id = R.drawable.likeicon),
         contentDescription = "Edit",
-        tint = tint,
-        modifier = modifier.size(size)
+        tint = colors.white,
     )
 
 }
@@ -45,13 +39,13 @@ fun PreviewEditIcon() {
         contentAlignment = Alignment.Center
     ) {
         Column {
-            EditIcon(tint = Color.Black, size = 20.dp)
+            EditIcon()
             Spacer(modifier = Modifier.height(8.dp))
-            ChatBubble(tint = Color.Black, size = 30.dp)
+            ChatBubble()
             Spacer(modifier = Modifier.height(8.dp))
-            ArrowLeft(tint = Color.Black, size = 40.dp)
+            ArrowLeft()
             Spacer(modifier = Modifier.height(8.dp))
-            ArrowRight(tint = Color.Black, size = 50.dp)
+            ArrowRight()
         }
     }
 }
