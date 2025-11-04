@@ -1,11 +1,9 @@
 package components
 
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -33,26 +31,27 @@ fun PageHeadline(
                 color = colors.borderColor,
                 shape = RectangleShape
             )
-            .padding(horizontal = space.m, vertical = space.xs)
+            .padding(top = space.l, bottom = space.m, )
             .then(
                 Modifier.drawBehind {
                     val strokeWidth = 1.dp.toPx()
-                    val y = size.height - strokeWidth / 2
+
                     drawLine(
                         color = colors.borderColor,
-                        start = Offset(0f, y),
-                        end = Offset(size.width, y),
+                        start = Offset(0f, size.height),
+                        end = Offset(size.width, size.height),
                         strokeWidth = strokeWidth
                     )
                 }
             )
+            .padding(horizontal = space.s, vertical = 0.dp)
     ) {
         Text(
             text = text,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Normal,
             modifier = Modifier
-                .padding(space.xs)
+                .padding(bottom = space.xs)
         )
     }
 }
