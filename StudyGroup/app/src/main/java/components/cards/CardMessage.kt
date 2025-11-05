@@ -30,7 +30,7 @@ import com.example.studygroup.ui.theme.LocalSpacing
 /**
  * Small card for displaying a "post", used for example in "your posts" screen, or in overview of "chats"
  *
- * "post" MUST be JSON and MUST contain the fields:
+ * "details" MUST be JSON and MUST contain the fields:
  * - time
  * - location
  * - building
