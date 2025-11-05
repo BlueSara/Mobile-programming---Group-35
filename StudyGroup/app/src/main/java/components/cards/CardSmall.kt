@@ -26,6 +26,21 @@ import androidx.compose.ui.unit.sp
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+/**
+ * Small card for displaying a "post", used for example in "your posts" screen, or in overview of "chats"
+ *
+ * "post" MUST be JSON and MUST contain the fields:
+ * - title
+ * - topic
+ * - subjectCode
+ * - subject
+ * - expirationDate
+ *
+ * @param post Map<String, Any>, default: null. The current post to display
+ * @param onClick Unit, default: null. Callback for when button in top right of card is clicked
+ * @param showResponse Boolean, default: false. Boolean for handling if currents user response show be displayed next to top right button or not.
+ * @param icon Composable, Default: null. The icon to display in the top-right button (for example edit or arrow icon)
+ * */
 @Composable
 fun CardSmall(
     post: Map<String, Any> ?= null,
@@ -70,7 +85,7 @@ fun CardSmall(
             Row(
                 horizontalArrangement = Arrangement.spacedBy(space.xs)
             ){
-                if (showResponse){
+                if (showResponse && data["response"] != null){
                     Column(
                         modifier = Modifier
                             .border(width = space.xs, color = borderColor, shape = RoundedCornerShape(4.dp))

@@ -32,6 +32,16 @@ import androidx.compose.ui.unit.sp
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+/**
+ * Drop down menu to display under inputs where user should receive options while typing.
+ *
+ * Each option in options must contain fields "code" and "name", or "abbr" and "name"
+ *
+ * @param onSelect Unit, default: null. Callback returning the selected option as Map<String, Any>.
+ * @param onDismiss Unit, default: null. Callback for when to close menu without sending returning data.
+ * @param options List<Map<String, Any>>. The options that should be displayed in the list of options.
+ * @param text String, default: <text>. The text displayed in the blue box at the bottom
+ * */
 @Composable
 fun DropDown(
     onSelect: ((Map<String, Any>) -> Unit)? = null,
@@ -96,7 +106,7 @@ fun DropDown(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "${it["code"] ?: ""} - ${it["name"]?: ""}",
+                            text = "${it["code"] ?: it["abbr"] ?: ""} - ${it["name"]?: ""}",
                             fontWeight = FontWeight.Normal,
                             fontSize = 18.sp
                         )

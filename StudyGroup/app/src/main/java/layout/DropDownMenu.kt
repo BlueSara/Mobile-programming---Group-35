@@ -19,6 +19,11 @@ import com.example.studygroup.ui.theme.LocalSpacing
 
 
 //the drop-down menu displayed when menu-button is clicked
+/**
+ * This is the "hamburger-menu" used in the layout to show pages that can be navigated to
+ * @param onDismiss Unit, default: null. Callback for when clicking outside the menu in order to close it
+ * @param onNavigate Unit, default: null. Callback for clicking a screen option to navigate to. Returns a string
+ * */
 @Composable
 fun DropdownMenu(
     onDismiss: (() -> Unit)? = null,

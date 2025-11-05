@@ -21,6 +21,18 @@ import androidx.compose.ui.unit.sp
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+/**
+ * Large card for displaying a "post", used for mainly in "home" screen when viewing posts
+ *
+ * "post" MUST be JSON and MUST contain the fields:
+ * - title
+ * - topic
+ * - subjectCode
+ * - subject
+ * - expirationDate
+ *
+ * @param post Map<String, Any>, default: null. The current post to display
+ * */
 @Composable
 fun CardLarge(post: Map<String, Any> ?= null){
 
