@@ -27,19 +27,32 @@ import com.example.studygroup.R
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+/**
+ * Small card for displaying a "post", used for example in "your posts" screen, or in overview of "chats"
+ *
+ * "details" MUST be JSON and MUST contain the fields:
+ * - time
+ * - location
+ * - building
+ * - room
+ * - assistAgreed (Boolean, if "assisting user" has agreed
+ * - ownerAgreed (Boolean, if the owner of the
+ * - userAgreed (Boolean, if current user has agreed)
+ * - isSelected (Boolean, if it has been selected as meetup)
+ *
+ * @param details Map<String, Any>, default: null. The current post to display
+ * @param onClick Unit, default: null. Callback for when button in top right (like/dislike) of card is clicked
+ * */
 @Composable
 fun CardMessage(
-    post: Map<String, Any> ?= null,
+    details: Map<String, Any> ?= null,
     onClick: (() -> Unit)?=null,
 ){
 
     val colors = LocalCustomColors.current
     val space = LocalSpacing.current
 
-    val data = post ?: mapOf(
-        "messageID" to "someID",
-        "groupID" to "someGroupID",
-        "postID" to "somePostI",
+    val data = details ?: mapOf(
         "time" to "28-11-2025, 12:00",
         "location" to "NTNU, Gjøvik",
         "building" to "Amethyst",
@@ -177,7 +190,7 @@ fun CardMessage(
                     verticalArrangement = Arrangement.spacedBy(space.s)
                 ){
                     Text(
-                        text= "${data["comment"]}",
+                        text= "${data["comment"] ?: ""}",
                         fontSize = 18.sp,
                         color = colors.grey
                     )

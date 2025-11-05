@@ -6,14 +6,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+/**
+ * The footer used in the layout component
+ * @param footer Composable, default: null. Content to display in the footer (Row)
+ * */
 @Composable
 fun Footer(footer: (@Composable (() -> Unit))? = null){
     val colors = LocalCustomColors.current
