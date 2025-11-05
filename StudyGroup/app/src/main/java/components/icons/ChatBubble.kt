@@ -19,7 +19,7 @@ import com.example.studygroup.ui.theme.LocalCustomColors
 fun ChatBubble(){
     val colors = LocalCustomColors.current
     Icon(
-        painter = painterResource(id = R.drawable.chatbuttle),
+        painter = painterResource(id = R.drawable.chatbubble),
         contentDescription = "Chat",
         tint = colors.black,
     )
