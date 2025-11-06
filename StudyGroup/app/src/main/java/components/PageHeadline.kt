@@ -17,6 +17,14 @@ import androidx.compose.ui.unit.sp
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+
+/**
+ * PageHeadline
+ *
+ * A reusable headline component used at the top of the pages in the application.
+ *
+ * @param text String, default: "". The headline text that is shown inside the component
+ */
 @Composable
 fun PageHeadline(
     text: String = "",
@@ -59,5 +67,5 @@ fun PageHeadline(
 @Preview(showBackground = true)
 @Composable
 fun PreviewPageHeadLine(){
-    PageHeadline(text = "hhahahahah")
+    PageHeadline(text = "Headline title")
 }

@@ -37,12 +37,23 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
-
+/**
+ * PopUp
+ *
+ * A scrollable popup overlaying other screen content.
+ * Has a transparent black background around the popup. This allows
+ * the content underneath to remain visible while popup is active.
+ *
+ * @param onDismiss Unit, default: null. callback triggered when the popup should be closed
+ * @param title String, default: "". title text displayed in the popup header
+ * @param content @Composable, default: null. content displayed inside the popup
+ *
+ */
 @Composable
 fun PopUp(
     onDismiss: (() -> Unit)? = null,
     title: String = "",
-    content: @Composable () -> Unit = {}
+    content: (@Composable () -> Unit )?= null
 ) {
     val colors = LocalCustomColors.current
     val space = LocalSpacing.current
@@ -111,7 +122,7 @@ fun PopUp(
                         .verticalScroll(state = rememberScrollState()),
                     verticalArrangement = Arrangement.Top
                 ) {
-                    content()
+                    if (content != null) content()
                 }
             }
         }
