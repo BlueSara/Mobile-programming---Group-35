@@ -8,7 +8,6 @@ import (
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
-	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
 
@@ -35,11 +34,6 @@ func DB() (*Firestore, error) {
 	var initErr error
 
 	once.Do(func() {
-
-		if envErr := godotenv.Load(); envErr != nil {
-			initErr = errors.New("failed to load environment variables")
-			return
-		}
 
 		credsPath := os.Getenv("FIREBASE_CREDENTIALS")
 		ctx := context.Background()

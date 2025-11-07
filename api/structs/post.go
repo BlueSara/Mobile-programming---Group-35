@@ -15,9 +15,9 @@ type Post struct {
 	SubjectID      string    `json:"subjectID" validate:"len=20,required"`
 	Topic          string    `json:"topic" validate:"min=4,max=30"`
 	UseProximity   bool      `json:"useProximity"`
-	ExpidationDate time.Time `json:"expirationDate" validate:"len=20,required"`
-	XCoord         float64   `json:"xCoord" validate:"min=-180,max=180"`
-	YCoord         float64   `json:"yCoord" validate:"min=-90,max=90"`
+	ExpidationDate time.Time `json:"expirationDate" validate:"required"`
+	XCoord         float64   `json:"xCoord"`
+	YCoord         float64   `json:"yCoord"`
 }
 
 // struct used for formatting posts returned to used.

@@ -50,6 +50,7 @@ func Register(path string, method string, handler Handler) {
 
 // is called in main.go
 func Router(path, method string, r *http.Request, w http.ResponseWriter) {
+
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	node := routes
 	params := make(Param)

@@ -11,9 +11,8 @@ import (
 // when using in "User", field "UserID" should be empty
 // -> or else these just refer to the document itself
 type UserResponse struct {
-	PostID   *firestore.DocumentRef `firestore:"postID,omitempty"`
-	UserID   *firestore.DocumentRef `firestore:"userID,omitempty"`
-	Response string                 `firestore:"response"`
+	UserID   string `firestore:"userID,omitempty"`
+	Response string `firestore:"response"`
 }
 
 type UserSubject struct {

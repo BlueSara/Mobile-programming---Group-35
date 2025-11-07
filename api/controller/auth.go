@@ -92,7 +92,7 @@ func Signup(r *http.Request, w http.ResponseWriter, credentials *structs.UserSig
 				})
 				continue
 			}
-			existingSubject, subjectErr := services.GetSubjectWithID(s)
+			existingSubject, subjectErr := services.GetSubjectWithID(s.SubjectID)
 			if subjectErr != nil {
 				response.Error(http.StatusNotFound, subjectErr.Error(), w)
 				return

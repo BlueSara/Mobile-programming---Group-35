@@ -5,23 +5,22 @@ import (
 	"fmt"
 	"studygroup_api/database"
 	"studygroup_api/models"
-	"studygroup_api/structs"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func GetSubjectWithID(subjectStruct structs.Subject) (models.Subject, error) {
+func GetSubjectWithID(subjectID string) (models.Subject, error) {
 	db, dbErr := database.DB()
 	if dbErr != nil {
 		return models.Subject{}, dbErr
 	}
 
-	doc, docErr := db.Client.Collection("subjects").Doc(subjectStruct.SubjectID).Get(db.Ctx)
+	doc, docErr := db.Client.Collection("subjects").Doc(subjectID).Get(db.Ctx)
 	if docErr != nil {
 		if status.Code(docErr) == codes.NotFound {
-			return models.Subject{}, fmt.Errorf("referenced subject %v not found", &subjectStruct.SubjectName)
+			return models.Subject{}, fmt.Errorf("referenced subject not found")
 		}
 		return models.Subject{}, errors.New("internal server error")
 	}
@@ -31,7 +30,7 @@ func GetSubjectWithID(subjectStruct structs.Subject) (models.Subject, error) {
 		return models.Subject{}, universityErr
 	}
 
-	subject.SubjectID = subjectStruct.SubjectID
+	subject.SubjectID = subjectID
 
 	return subject, nil
 }

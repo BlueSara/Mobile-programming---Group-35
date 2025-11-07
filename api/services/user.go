@@ -4,6 +4,7 @@ import (
 	"studygroup_api/database"
 	"studygroup_api/models"
 
+	"cloud.google.com/go/firestore"
 	"google.golang.org/api/iterator"
 )
 
@@ -43,4 +44,17 @@ func CreateUser(user models.User) error {
 	_, _, docRefErr := db.Client.Collection("users").Add(db.Ctx, user)
 
 	return docRefErr
+}
+
+func UpdateUsersPosts(userID, postID string) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	_, insertErr := db.Client.Collection("users").Doc(userID).Update(db.Ctx, []firestore.Update{
+		{Path: "posts", Value: firestore.ArrayUnion(postID)},
+	})
+
+	return insertErr
 }
