@@ -16,6 +16,11 @@ type UserResponse struct {
 	Response string                 `firestore:"response"`
 }
 
+type UserSubject struct {
+	SubjectID  []*firestore.DocumentRef `firestore:"subjectID"`
+	Obligatory bool                     `firestore:"obligatory"`
+}
+
 // struct to use with db for inserting/extracting user-information
 // userID should be empty when inserting/updating in db
 type User struct {
@@ -28,8 +33,8 @@ type User struct {
 	InitialEndDate time.Time                `firestore:"initialEndDate"`
 	UpdatedEndDate time.Time                `firestore:"updatedEndDate"`
 	UniversityID   *firestore.DocumentRef   `firestore:"universityID"`
-	StudyProgram   StudyProgram             `firestore:"studyProgram"`
-	Subjects       []Subject                `firestore:"subjects"`
+	StudyProgram   *firestore.DocumentRef   `firestore:"studyProgram"`
+	Subjects       []*firestore.DocumentRef `firestore:"subjects"`
 	Responses      []UserResponse           `firestore:"responses"`
 	Posts          []*firestore.DocumentRef `firestore:"posts"`
 }
@@ -59,12 +64,4 @@ type Message struct {
 	UsersAgreed  []*firestore.DocumentRef `firestore:"usersAgreed"`
 	UsersDecline []*firestore.DocumentRef `firestore:"usersDecline"`
 	IsSelected   bool                     `firestore:"isSelected"`
-}
-
-// struct to use with db for tracking user sessions (signed in/signed out users)
-type Session struct {
-	SessionID  string                 `firestore:"sessionID,omitempty"`
-	UserID     *firestore.DocumentRef `firestore:"userID"`
-	IsSignedIn bool                   `firestore:"isSignedIn"`
-	SignedInAt time.Time              `firestore:"signedInAt"`
 }

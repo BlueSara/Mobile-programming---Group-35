@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"studygroup_api/handler"
 	"studygroup_api/routes"
 )
 
@@ -11,6 +12,9 @@ func main() {
 		router usage example:
 		routes.Register("/test/:testID/path", "GET", handler.SomeHandler)
 	*/
+
+	routes.Register("/auth/signup", "POST", handler.Signup)
+	routes.Register("/auth/signin", "POST", handler.Signin)
 
 	port := ":3000"
 
