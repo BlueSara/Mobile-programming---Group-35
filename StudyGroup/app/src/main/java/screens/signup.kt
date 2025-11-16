@@ -1,13 +1,17 @@
 package screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,21 +28,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import components.AppButton
+import components.ButtonType
+import components.DateInput
+import components.DropDown
+import components.PopUp
 import components.Select
 import components.TextInput
 import layout.Footer
+import java.time.LocalDate
 
 @Composable
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 fun SignupCredentials(
     navController: NavHostController ?=null)
 {
-    var firstname by remember { mutableStateOf("") }
-    var lastname by remember { mutableStateOf("") }
-    var unimail by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordConfirmation by remember { mutableStateOf("") }
-    var affiliationID by remember { mutableStateOf("") }
+    var mFirstname by remember { mutableStateOf("") }
+    var mLastname by remember { mutableStateOf("") }
+    var mUnimail by remember { mutableStateOf("") }
+    var mPassword by remember { mutableStateOf("") }
+    var mPasswordConfirmation by remember { mutableStateOf("") }
+    var mAffiliationID by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,31 +73,31 @@ fun SignupCredentials(
                 .padding(top = 40.dp)
         )
 
-
+        Spacer(modifier = Modifier.height(20.dp))
         TextInput(
-            value = firstname,
-            onChange = { firstname = it },
+            value = mFirstname,
+            onChange = { mFirstname = it },
             label = "First name"
         )
         TextInput(
-            value = lastname,
-            onChange = { lastname = it },
+            value = mLastname,
+            onChange = { mLastname = it },
             label = "Last name"
         )
         TextInput(
-            value = unimail,
-            onChange = { unimail = it },
+            value = mUnimail,
+            onChange = { mUnimail = it },
             label = "University email"
         )
         TextInput(
-            value = { "*".repeat(password.length) }(),
-            onChange = { password = it },
+            value = { "*".repeat(mPassword.length) }(),
+            onChange = { mPassword = it },
             label = "Password",
             maxLength = 100
         )
         TextInput(
-            value = { "*".repeat(passwordConfirmation.length) }(),
-            onChange = { passwordConfirmation = it },
+            value = { "*".repeat(mPasswordConfirmation.length) }(),
+            onChange = { mPasswordConfirmation = it },
             label = "Confirm password",
             maxLength = 100
         )
@@ -102,7 +111,7 @@ fun SignupCredentials(
                 .padding(top = 24.dp)
         )
         Select(
-            options = listOf(
+            options = listOf(   // TODO: CHANGE THIS TO BE REAL DATA
                 mapOf(
                     Pair("id", "1234"),
                     Pair("name", "NTNU")
@@ -132,6 +141,89 @@ fun SignupCredentials(
 }
 
 @Composable
+@Preview(showBackground = true)
 fun SignupUniversity(
-    navController: NavHostController ?=null){
+    navController: NavHostController ?=null)
+{
+    var mStudyProgram by remember { mutableStateOf("") }
+    var mAbbreviation by remember { mutableStateOf("") }
+    var mDateStarted by remember {mutableStateOf(LocalDate.now()) }
+    var mGraduation by remember {mutableStateOf(LocalDate.now()) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+    ) {
+        Text(
+            text = "Welcome to Study Group!",
+            style = TextStyle(
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        )
+        Text(
+            text = "Sign up",
+            style = TextStyle(
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 40.dp)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+        TextInput(
+            value = mStudyProgram,
+            onChange = { mStudyProgram = it },
+            label = "Study program name",
+            maxLength = 50
+        )
+        TextInput(
+            value = mAbbreviation,
+            onChange = { mAbbreviation = it },
+            label = "Study program abbreviation",
+            maxLength = 10
+        )
+        
+        // TODO : ADD CHOSEN SUBJECTS
+
+        DateInput(
+            date = mDateStarted,
+            onDate = { mDateStarted = it },
+            label = "When did you start studying?"
+        )
+        DateInput(
+            date = mGraduation,
+            onDate = { mGraduation = it },
+            label = "When do you graduate?"
+        )
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AppButton(
+                    modifier = Modifier.weight(1f),
+                    text = "Go Back",
+                    onClick = { /* TODO */ },
+                    type = ButtonType.DANGER
+                )
+                AppButton(
+                    modifier = Modifier.weight(1f),
+                    text = "Sign Up",
+                    onClick = { /* TODO */ }
+                )
+            }
+        }
+    }
 }
