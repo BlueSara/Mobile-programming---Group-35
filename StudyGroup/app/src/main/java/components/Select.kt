@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.toSize
  * @param onChange callback function when an option is selected
  * @param options different options to select from
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Select(
     onChange: ((String) -> Unit)? = null,
@@ -45,41 +46,27 @@ fun Select(
         Icons.Filled.KeyboardArrowDown
 
     Column(Modifier.padding(20.dp)) {
-        OutlinedTextField(
-            value = mSelectedText,
-            onValueChange = { mSelectedText = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                // makes the items in the dropdown as large as this box
-                .onGloballyPositioned { coordinates ->
-                    mTextFieldSize = coordinates.size.toSize()
-                },
-            // readonly for now, as no search functionality will(?) be added
-            readOnly = true,
-            label = {Text("Select option")},
-            trailingIcon = {
-                Icon(icon,"contentDescription",
-                    Modifier.clickable { mExpanded = !mExpanded })
-            }
-        )
-
-        DropdownMenu(
+        ExposedDropdownMenuBox(
             expanded = mExpanded,
-            onDismissRequest = { mExpanded = false },
-            modifier = Modifier
-                .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
+            onExpandedChange = { mExpanded = !mExpanded }
         ) {
-            options.forEach { option ->
-                val name = option["name"]
-                val id = option["id"]
-
-                // we should only display non-broken data, where we have both an id and a name
-                if (name != null && id != null) {
+            OutlinedTextField(
+                value = mSelectedText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = mExpanded) },
+                modifier = Modifier.menuAnchor()
+            )
+            ExposedDropdownMenu(
+                expanded = mExpanded,
+                onDismissRequest = { mExpanded = false }
+            ) {
+                options.forEach { option ->
                     DropdownMenuItem(
-                        text = { Text(text = name) },
+                        text = { Text(option["name"] ?: "") },
                         onClick = {
-                            mSelectedText = name
-                            onChange?.invoke(id)
+                            mSelectedText = option["name"] ?: ""
+                            onChange?.invoke(option["id"] ?: "")
                             mExpanded = false
                         }
                     )

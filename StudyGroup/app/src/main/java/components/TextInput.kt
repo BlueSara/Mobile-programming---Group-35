@@ -85,6 +85,7 @@ fun TextInput(value: String = "",
                 textStyle = TextStyle(
                     fontSize = 18.sp,
                 ),
+                singleLine = true,
                 modifier = Modifier
                     .weight(1f)
                     .onFocusChanged { it ->
