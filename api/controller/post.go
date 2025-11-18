@@ -32,3 +32,8 @@ func CreatePost(r *http.Request, w http.ResponseWriter, token *structs.Token, po
 
 	response.Object(http.StatusOK, post, w)
 }
+
+func AnswerPost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID, answer string) {
+
+	response.Message(http.StatusOK, postID, w)
+}
