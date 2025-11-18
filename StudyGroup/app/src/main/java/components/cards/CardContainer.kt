@@ -16,6 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+/**
+ * Container to use for cards or UI components requiring the same "frames".
+ * Handles so content is in a container with "correct" rounded corners, shadow and border
+ *
+ * @param content Composable, default: null. The content to display in the card
+ * */
 @Composable
 fun CardContainer(content :(@Composable (() ->Unit))? = null){
     val colors = LocalCustomColors.current

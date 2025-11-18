@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 	"strings"
-	"studygroup_api/status"
+	"studygroup_api/response"
 )
 
 // for mapping params, such as ":postID"
@@ -50,6 +50,7 @@ func Register(path string, method string, handler Handler) {
 
 // is called in main.go
 func Router(path, method string, r *http.Request, w http.ResponseWriter) {
+
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	node := routes
 	params := make(Param)
@@ -61,14 +62,14 @@ func Router(path, method string, r *http.Request, w http.ResponseWriter) {
 			node = node.Children["*"]
 			params[node.Param] = p
 		} else {
-			status.Error(http.StatusNotFound, "Not found", w)
+			response.Error(http.StatusNotFound, "Not found", w)
 			return
 		}
 	}
 
 	handler, handlerOK := node.Handler[method]
 	if !handlerOK {
-		status.Error(http.StatusMethodNotAllowed, "Method not allowed", w)
+		response.Error(http.StatusMethodNotAllowed, "Method not allowed", w)
 		return
 	}
 

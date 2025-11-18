@@ -18,9 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.studygroup.ui.theme.LocalCustomColors
@@ -28,13 +27,15 @@ import com.example.studygroup.ui.theme.LocalSpacing
 import components.icons.ArrowLeft
 import components.icons.ChatBubble
 
-
+/**
+ * @param arrowBack Boolean, default: false. Handles if header show a arrow back (true), or chat bubble icon(false)
+ * @param onMenu Unit, default: null. Callback function for when menu has been clicked
+ * @param onClick Unit, default: null. Callback function for when icon (top left) has been clicked.
+ * */
 @Composable
-fun Header(arrowBack: Boolean,
+fun Header(arrowBack: Boolean = false,
            onMenu: (() -> Unit)? = null,
            onClick: (() -> Unit)? = null,
-           showFilter: Boolean = false,
-           onFilter: (() -> Unit)? = null
 ){
     val colors = LocalCustomColors.current
     val space = LocalSpacing.current
@@ -65,13 +66,8 @@ fun Header(arrowBack: Boolean,
                 modifier = Modifier
                     .width(space.xl)
             ){
-                //render icon in btn only if not null
-                if (arrowBack) {
-                    ArrowLeft()
-                }
-                else{
-                    ChatBubble()
-                }
+                if (arrowBack) ArrowLeft()
+                else ChatBubble()
             }
             Text(
                 text="StudyGroup",
@@ -83,22 +79,6 @@ fun Header(arrowBack: Boolean,
         Row(
             horizontalArrangement = Arrangement.spacedBy(space.s)
         ){
-            //only show filter-button if bool is true
-            if (showFilter){
-                Button(
-                    onClick = {onFilter?.invoke()},
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.foreground,
-                        contentColor = colors.black,
-                    ),
-                    contentPadding = PaddingValues(vertical = space.xs),
-                    shape = RoundedCornerShape(0.dp),
-                    modifier = Modifier
-                        .width(space.xl)
-                ){
-
-                }
-            }
 
             //menu-button
             Button(
@@ -129,4 +109,11 @@ fun Header(arrowBack: Boolean,
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewHeader(){
+    Header(arrowBack = false)
+    Header(arrowBack = true)
 }

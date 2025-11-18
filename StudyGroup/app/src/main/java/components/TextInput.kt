@@ -30,6 +30,16 @@ import androidx.compose.ui.unit.sp
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+/**
+ * text-input, for inputting text in a single line input
+ * Component does not hold the text-state itself
+ * @param value String, default: "", the value to display in the input
+ * @param onChange Unit, default: null. Returns the updated value of the input
+ * @param onFocus Unit, default: null. Callback for when input receives focus
+ * @param onBlur Unit, default: null. Callback for when input is no longer in focus
+ * @param label String, default: <label>, the text displayed above the input
+ * @param maxLength Int, default: 30. Max length that the input can have, also the number
+ * */
 @Composable
 fun TextInput(value: String = "",
               onChange: ((String) -> Unit)? = null,
@@ -75,6 +85,7 @@ fun TextInput(value: String = "",
                 textStyle = TextStyle(
                     fontSize = 18.sp,
                 ),
+                singleLine = true,
                 modifier = Modifier
                     .weight(1f)
                     .onFocusChanged { it ->

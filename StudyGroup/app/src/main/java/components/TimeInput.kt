@@ -39,6 +39,13 @@ import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 import java.time.LocalTime
 
+/**
+ * Time-input for selecting time (of day). Shows dialog box for selecting time when input is clicked
+ * Component does not hold the time-state itself
+ * @param time LocalTime, default: LocalTime.now(), the value to display in the input
+ * @param onSubmit Unit, default: null. returns "int, int" (hour, minute) when a time is selected
+ * @param label String, default: <label>, the text displayed above the input
+ * */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeInput(

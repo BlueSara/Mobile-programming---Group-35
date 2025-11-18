@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,6 +32,15 @@ import androidx.compose.ui.unit.sp
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
+/**
+ * text-input, for inputting text in a multiple-line input.
+ * @param value String, default: "", the value to display in the input
+ * @param onChange Unit, default: null. Returns the updated value of the input
+ * @param onFocus Unit, default: null. Callback for when input receives focus
+ * @param onBlur Unit, default: null. Callback for when input is no longer in focus
+ * @param label String, default: <label>, the text displayed above the input
+ * @param maxLength Int, default: 30. Max length that the input can have, also the number
+ * */
 @Composable
 fun TextArea(value: String = "",
               onChange: ((String) -> Unit)? = null,
@@ -98,7 +105,7 @@ fun TextArea(value: String = "",
                 }
             )
             Text(
-                text= "${state.text.toString().length}/${maxLength.toString()}",
+                text= "${state.text.toString().length}/${maxLength}",
                 fontSize = 18.sp,
                 color = colors.grey,
                 modifier = Modifier

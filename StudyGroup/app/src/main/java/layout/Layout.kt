@@ -18,13 +18,21 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
-
+/**
+ * The layout component that holds the top-bar, screen content and footer.
+ * It handles the main-layout responsibilities, for a consistent visual presentation.
+ *  @param navController The navigation controller (navHostController) so layout can handle basic screen navigation
+ *  @param arrowBack Boolean, if true, will navigate to previous screen, if false, will show chatBubble and navigate to "chats" screen
+ *  @param showFilter Boolean, if true, will show option to toggle filter-pop-up
+ *  @param pageDetails Composable of content to show at the top of the screen below the top-bar
+ *  @param content Composable, main content to show in the screen
+ *  @param footer Composable, content to insert in sticky footer container at the bottom of the screen
+* */
 @Composable
 fun Layout(
     navController: NavHostController ?=null,
     arrowBack: Boolean = false,
     showFilter: Boolean = false,
-    onFilter: (() -> Unit)? = null,
     pageDetails: (@Composable (() -> Unit))? = null,
     content: (@Composable (() -> Unit))? = null,
     footer: (@Composable (() -> Unit))? = null,
@@ -59,8 +67,6 @@ fun Layout(
                     if (arrowBack) navController?.popBackStack()
                     else navController?.navigate("home")
                 },
-                onFilter ={onFilter?.invoke()},
-                showFilter = showFilter
             )
 
             Box(

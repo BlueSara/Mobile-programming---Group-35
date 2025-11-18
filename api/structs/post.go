@@ -5,19 +5,19 @@ import "time"
 // struct used when a user is fetching posts
 type FetchPost struct {
 	Page   int     `json:"page"`
-	XCoord float64 `json:"xCoord" validation:"required,min=-180,max=180"`
-	YCoord float64 `json:"yCoord" validation:"required,min=-90,max=90"`
+	XCoord float64 `json:"xCoord" validate:"required,min=-180,max=180"`
+	YCoord float64 `json:"yCoord" validate:"required,min=-90,max=90"`
 }
 
 // struct used when a user is creating/editing a post
 type Post struct {
-	Title          string    `json:"title" validation:"min=5,max=200,required"`
-	SubjectID      string    `json:"subjectID" validation:"len=20,required"`
-	Topic          string    `json:"topic" validation:"min=4,max=30"`
+	Title          string    `json:"title" validate:"min=5,max=200,required"`
+	SubjectID      string    `json:"subjectID" validate:"len=20,required"`
+	Topic          string    `json:"topic" validate:"min=4,max=30"`
 	UseProximity   bool      `json:"useProximity"`
-	ExpidationDate time.Time `json:"expirationDate" validation:"len=20,required"`
-	XCoord         float64   `json:"xCoord" validation:"min=-180,max=180"`
-	YCoord         float64   `json:"yCoord" validation:"min=-90,max=90"`
+	ExpidationDate time.Time `json:"expirationDate" validate:"required"`
+	XCoord         float64   `json:"xCoord"`
+	YCoord         float64   `json:"yCoord"`
 }
 
 // struct used for formatting posts returned to used.

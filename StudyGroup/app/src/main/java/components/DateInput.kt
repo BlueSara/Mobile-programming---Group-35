@@ -45,10 +45,17 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
+/**
+ * Date-input for selecting time (of day). Shows dialog box for selecting date when input is clicked
+ * Component does not hold the date-state itself
+ * @param date LocalDate, default: LocalDate.now(), the value to display in the input
+ * @param onDate Unit, default: null. returns "LocalDate" when a date is selected
+ * @param label String, default: <label>, the text displayed above the input
+ * */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateInput(
-    date: LocalDate? = null,
+    date: LocalDate? = LocalDate.now(),
     onDate: ((LocalDate) -> Unit)? = null,
     label: String?= "<label>"
 ){
