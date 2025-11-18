@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
+import components.icons.ArrowLeft
+import components.icons.ChatBubble
 
 
 @Composable
@@ -65,12 +67,10 @@ fun Header(arrowBack: Boolean,
             ){
                 //render icon in btn only if not null
                 if (arrowBack) {
-                    //placeholder for arrow back icon
-                    Text(text = "A")
+                    ArrowLeft()
                 }
                 else{
-                    //placeholder for chat bubble icon
-                    Text(text = "C")
+                    ChatBubble()
                 }
             }
             Text(
