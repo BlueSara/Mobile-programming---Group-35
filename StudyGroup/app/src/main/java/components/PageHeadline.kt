@@ -1,5 +1,6 @@
 package components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +40,7 @@ fun PageHeadline(
                 color = colors.borderColor,
                 shape = RectangleShape
             )
+            .background(colors.background)
             .padding(top = space.l, bottom = space.m, )
             .then(
                 Modifier.drawBehind {

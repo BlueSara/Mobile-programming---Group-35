@@ -1,6 +1,7 @@
 package layout
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,7 +26,8 @@ fun Footer(footer: (@Composable (() -> Unit))? = null){
             .background(colors.foreground)
             .padding(space.s)
             .fillMaxWidth()
-            .shadow(elevation = space.xl, shape = RectangleShape)
+            .shadow(elevation = space.xl, shape = RectangleShape),
+        horizontalArrangement = Arrangement.spacedBy(space.xs)
     ){
         if (footer != null) footer()
     }
