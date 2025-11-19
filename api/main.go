@@ -24,6 +24,7 @@ func main() {
 	routes.Register("/auth/signup", "POST", handler.Signup)
 	routes.Register("/auth/signin", "POST", handler.Signin)
 	routes.Register("/post/create", "POST", handler.CreatePost)
+	routes.Register("/post/groups", "GET", handler.GetPosts)
 
 	port := ":3000"
 
