@@ -34,19 +34,19 @@ type User struct {
 	UniversityID   *firestore.DocumentRef   `firestore:"universityID"`
 	StudyProgram   *firestore.DocumentRef   `firestore:"studyProgram"`
 	Subjects       []*firestore.DocumentRef `firestore:"subjects"`
-	Responses      []UserResponse           `firestore:"responses"`
-	Posts          []*firestore.DocumentRef `firestore:"posts"`
+	Responses      []PostResponse           `firestore:"responses"`
+	Posts          []string                 `firestore:"posts"`
 }
 
 // struct to use with db for groups made when matches have been created from a post
 // GroupID should be empty when inserting/updating in db
 type Group struct {
-	GroupID        string                   `firestore:"groupID,omitempty"`
-	PostID         *firestore.DocumentRef   `firestore:"postID"`
-	Participants   []*firestore.DocumentRef `firestore:"participants"`
-	AssistingUsers []*firestore.DocumentRef `firestore:"assistingUsers"`
-	DittoUsers     []*firestore.DocumentRef `firestore:"dittoUsers"`
-	Messages       []*firestore.DocumentRef `firestore:"messages"`
+	GroupID        string   `firestore:"groupID,omitempty"`
+	PostID         string   `firestore:"postID"`
+	Participants   []string `firestore:"participants"`
+	AssistingUsers []string `firestore:"assistingUsers"`
+	DittoUsers     []string `firestore:"dittoUsers"`
+	Messages       []string `firestore:"messages"`
 }
 
 // struct to use with db for storing messages sent in groups

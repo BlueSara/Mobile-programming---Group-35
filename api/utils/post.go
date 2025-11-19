@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func CreatePostModel(postStruct *structs.Post, subject *models.Subject, userID string) models.Post {
+func CreatePostModel(postStruct *structs.Post, subject *models.Subject, userID, universityID string) models.Post {
 
 	return models.Post{
 		Title:          postStruct.Title,
@@ -20,9 +20,10 @@ func CreatePostModel(postStruct *structs.Post, subject *models.Subject, userID s
 			UserID:   userID,
 			Response: "ditto",
 		}},
-		Topic:  postStruct.Topic,
-		XCoord: postStruct.XCoord,
-		YCoord: postStruct.YCoord,
-		UserID: &userID,
+		Topic:        postStruct.Topic,
+		XCoord:       postStruct.XCoord,
+		YCoord:       postStruct.YCoord,
+		UniversityID: universityID,
+		UserID:       &userID,
 	}
 }

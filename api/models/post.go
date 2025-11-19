@@ -10,6 +10,7 @@ type Post struct {
 	Title          string         `firestore:"title"`
 	CreatedAt      time.Time      `firestore:"createdAt"`
 	Subject        string         `firestore:"subject"`
+	UniversityID   string         `firestore:"universityID"`
 	SubjectCode    string         `firestore:"subjectCode"`
 	SubjectID      string         `firestore:"subjectID"`
 	ExpirationDate time.Time      `firestore:"expirationDate"`
@@ -19,4 +20,9 @@ type Post struct {
 	XCoord         float64        `firestore:"xCoord"`
 	YCoord         float64        `firestore:"yCoord"`
 	UserID         *string        `firestore:"userID"`
+}
+
+type PostResponse struct {
+	PostID   string `firestore:"postID"`
+	Response string `firestore:"response"`
 }

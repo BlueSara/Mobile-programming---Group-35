@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"studygroup_api/controller"
 	"studygroup_api/middleware/auth"
@@ -34,7 +33,6 @@ func CreatePost(r *http.Request, w http.ResponseWriter, params map[string]string
 
 	token, tokenErr := auth.IsUserAuth(r)
 	if tokenErr != nil {
-		fmt.Print(tokenErr)
 		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
 		return
 	}
@@ -70,7 +68,6 @@ func AnswerPost(r *http.Request, w http.ResponseWriter, params map[string]string
 
 	token, tokenErr := auth.IsUserAuth(r)
 	if tokenErr != nil {
-		fmt.Print(tokenErr)
 		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
 		return
 	}
