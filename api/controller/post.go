@@ -128,3 +128,78 @@ func AnswerPost(r *http.Request, w http.ResponseWriter, token *structs.Token, po
 	response.Message(http.StatusOK, "Answer submitted!", w)
 
 }
+
+func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, postID, answer string) {
+	post, postErr := services.GetPostByID(postID)
+	if postErr != nil {
+		response.Error(http.StatusInternalServerError, postErr.Error(), w)
+		return
+	}
+
+	if post.ExpirationDate.Before(time.Now().Local()) {
+		response.Error(http.StatusConflict, "This post has expired", w)
+		return
+	}
+
+	var userHasAnswered bool
+	userHasAnswered = false
+	for _, p := range post.Responses {
+		if p.UserID == token.UserID {
+			userHasAnswered = true
+			break
+		}
+	}
+
+	if !userHasAnswered {
+		response.Error(http.StatusConflict, "You cannot update a reply to a post you have not given an initial answer", w)
+		return
+	}
+
+	user, userErr := services.FindUserByID(token.UserID)
+	if userErr != nil {
+		response.Error(http.StatusInternalServerError, userErr.Error(), w)
+		return
+	}
+
+	if updatePostReplyErr := services.UpdatePostReply(token.UserID, answer, post, user); updatePostReplyErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error updating the reply", w)
+		return
+	}
+
+	updatedPost, updatedPostErr := services.GetPostByID(postID)
+	if updatedPostErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error 1", w)
+		return
+	}
+
+	//response.Object(http.StatusOK, updatedPost, w)
+
+	group, groupErr := services.GetGroupByID(postID)
+	if groupErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error finding groupd", w)
+		return
+	}
+
+	//check if any of the users have set that they can assist
+	hasAssistingUsers := services.CheckIfAnyAssistingUsers(updatedPost.Responses)
+	dittoUsers, assistUsers, participants := utils.CreateMembersNewGroup(updatedPost.Responses)
+
+	//create group if not already existing
+	if reflect.DeepEqual(group, models.Group{}) && hasAssistingUsers {
+		createGroupErr := services.CreateGroup(updatedPost, dittoUsers, assistUsers, participants)
+		if createGroupErr != nil {
+			response.Error(http.StatusInternalServerError, createGroupErr.Error(), w)
+			return
+		}
+
+		response.Message(http.StatusOK, "Post has been answered, and group created!", w)
+		return
+	}
+
+	if updateGroupErr := services.UpdateGroupMembers(group.GroupID, dittoUsers, assistUsers, participants); updateGroupErr != nil {
+		response.Error(http.StatusInternalServerError, updateGroupErr.Error(), w)
+		return
+	}
+
+	response.Message(http.StatusOK, "Answer updated!", w)
+}

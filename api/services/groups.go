@@ -101,3 +101,32 @@ func AddNewGroupMember(groupID, userID, answer string) error {
 
 	return insertParticipant
 }
+
+func UpdateGroupMembers(groupID string, dittoUsers, assistUsers, participants []string) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	groupRef := db.Client.Collection("groups").Doc(groupID)
+
+	if _, updateAssistErr := groupRef.Update(db.Ctx, []firestore.Update{
+		{Path: "assistingUsers", Value: assistUsers},
+	}); updateAssistErr != nil {
+		return updateAssistErr
+	}
+
+	if _, updateDittoErr := groupRef.Update(db.Ctx, []firestore.Update{
+		{Path: "dittoUsers", Value: dittoUsers},
+	}); updateDittoErr != nil {
+		return updateDittoErr
+	}
+
+	if _, updateParticipantErr := groupRef.Update(db.Ctx, []firestore.Update{
+		{Path: "participants", Value: participants},
+	}); updateParticipantErr != nil {
+		return updateParticipantErr
+	}
+
+	return nil
+}

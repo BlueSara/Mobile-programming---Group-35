@@ -74,3 +74,38 @@ func AnswerPost(r *http.Request, w http.ResponseWriter, params map[string]string
 
 	controller.AnswerPost(r, w, &token, postID, answer)
 }
+
+func UpdateAnswer(r *http.Request, w http.ResponseWriter, params map[string]string) {
+	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
+		response.Error(http.StatusTooManyRequests, "Too many requests", w)
+		return
+	}
+
+	var rawAnswer map[string]string
+	if unmarshalErr := json.NewDecoder(r.Body).Decode(&rawAnswer); unmarshalErr != nil {
+		response.Error(http.StatusBadRequest, "Invalid input", w)
+		return
+	}
+
+	answer := rawAnswer["answer"]
+
+	if answer != "ditto" && answer != "assist" && answer != "skip" {
+		response.Error(http.StatusBadRequest, "Invalid input", w)
+		return
+	}
+
+	//unmarshalling, returning err if fields are invalid
+	postID := params["postID"]
+	if len(postID) > 22 || len(postID) < 19 {
+		response.Error(http.StatusBadRequest, "Invalid post indentification", w)
+		return
+	}
+
+	token, tokenErr := auth.IsUserAuth(r)
+	if tokenErr != nil {
+		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
+		return
+	}
+
+	controller.UpdateAnswer(r, w, &token, postID, answer)
+}

@@ -55,6 +55,54 @@ func GetPostByID(postID string) (models.Post, error) {
 	return post, nil
 }
 
+func UpdatePostReply(userID, answer string, post models.Post, user models.User) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	var postResponses []models.UserResponse
+	for _, r := range post.Responses {
+		if r.UserID == userID {
+			postResponses = append(postResponses, models.UserResponse{
+				UserID:   userID,
+				Response: answer,
+			})
+		} else if r.UserID != userID {
+			postResponses = append(postResponses, r)
+		}
+	}
+
+	var userResponses []models.PostResponse
+	for _, r := range user.Responses {
+		if r.PostID == post.PostID {
+			userResponses = append(userResponses, models.PostResponse{
+				PostID:   post.PostID,
+				Response: answer,
+			})
+		} else if r.PostID != post.PostID {
+			userResponses = append(userResponses, r)
+		}
+	}
+
+	postRef := db.Client.Collection("posts").Doc(post.PostID)
+	userRef := db.Client.Collection("users").Doc(userID)
+
+	if _, updatePostErr := postRef.Update(db.Ctx, []firestore.Update{
+		{Path: "responses", Value: postResponses},
+	}); updatePostErr != nil {
+		return updatePostErr
+	}
+
+	if _, updateUserErr := userRef.Update(db.Ctx, []firestore.Update{
+		{Path: "responses", Value: userResponses},
+	}); updateUserErr != nil {
+		return updateUserErr
+	}
+
+	return nil
+}
+
 func InsertPostReply(postID, userID, answer string) error {
 	db, dbErr := database.DB()
 	if dbErr != nil {
