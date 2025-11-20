@@ -181,8 +181,8 @@ func Signup(r *http.Request, w http.ResponseWriter, credentials *structs.UserSig
 		UpdatedEndDate: credentials.InitialEndDate,
 		UniversityID:   universityRef,
 		StudyProgram:   studyProgramRef,
-		Responses:      []models.UserResponse{},
-		Posts:          []*firestore.DocumentRef{},
+		Responses:      []models.PostResponse{},
+		Posts:          []string{},
 		Subjects:       userSubjects.SubjectID,
 	}
 

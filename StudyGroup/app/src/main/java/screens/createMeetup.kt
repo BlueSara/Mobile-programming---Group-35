@@ -1,15 +1,11 @@
 package screens
 
-import androidx.collection.mutableIntSetOf
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,9 +18,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.studygroup.ui.theme.LocalSpacing
 import components.AppButton
 import components.ButtonType
 import components.DateInput
+import components.PageHeadline
 import components.TextArea
 import components.TextInput
 import components.TimeInput
@@ -38,10 +36,14 @@ fun CreateMeetup(
     navController: NavHostController ?=null,
     meetupID: String?= null,
     ){
+
+    val space = LocalSpacing.current
     
     Layout(
         navController= navController,
         arrowBack = true,
+        pageDetails = {
+            PageHeadline(text="Create meetup suggestion")},
         content = {
             val topic: String = "mockup test"
             var mDate by remember { mutableStateOf(LocalDate.now()) }
@@ -52,10 +54,6 @@ fun CreateMeetup(
             var mComments by remember { mutableStateOf("") }
 
             Column {
-                Text(text = "Create meetup suggestion",fontSize = 24.sp)
-
-                Spacer(modifier = Modifier.height(8.dp))
-                HorizontalDivider()
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Topic: $topic",fontSize = 20.sp)
@@ -97,9 +95,8 @@ fun CreateMeetup(
         footer = {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(space.xs)
             ) {
                 AppButton(
                     modifier = Modifier.weight(1f),
