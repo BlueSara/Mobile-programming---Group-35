@@ -2,3 +2,4 @@
 .DS_Store
 *.BIN
 /env
+firebasekey.json

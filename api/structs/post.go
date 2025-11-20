@@ -4,7 +4,7 @@ import "time"
 
 // struct used when a user is fetching posts
 type FetchPost struct {
-	Page   int     `json:"page"`
+	//Page   int     `json:"page"`				// Removed as we are not using pagination
 	XCoord float64 `json:"xCoord" validate:"required,min=-180,max=180"`
 	YCoord float64 `json:"yCoord" validate:"required,min=-90,max=90"`
 }

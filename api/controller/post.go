@@ -32,3 +32,6 @@ func CreatePost(r *http.Request, w http.ResponseWriter, token *structs.Token, po
 
 	response.Object(http.StatusOK, post, w)
 }
+
+func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+}

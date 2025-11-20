@@ -1,8 +1,10 @@
 package services
 
 import (
+	"context"
 	"studygroup_api/database"
 	"studygroup_api/models"
+	"studygroup_api/structs"
 )
 
 func InsertNewPost(post models.Post) (string, error) {
@@ -29,4 +31,16 @@ func InsertNewPost(post models.Post) (string, error) {
 	newPost.PostID = docRef.ID
 
 	return newPost.PostID, nil
+}
+
+func GetAllPosts(collection structs.FetchPost) ([]structs.ReturnPost, error) {
+
+	db, dbErr := database.DB()
+	if dbErr != nil {
+
+		return nil, dbErr
+	}
+
+	iter := db.Client.Collection(collection).Documents(db.Ctx)
+
 }
