@@ -3,9 +3,9 @@ package services
 import (
 	"studygroup_api/database"
 	"studygroup_api/models"
-	"studygroup_api/structs"
 
 	"cloud.google.com/go/firestore"
+	"google.golang.org/api/iterator"
 )
 
 func InsertNewPost(post models.Post) (string, error) {
@@ -34,7 +34,7 @@ func InsertNewPost(post models.Post) (string, error) {
 	return newPost.PostID, nil
 }
 
-func GetAllPosts(collection structs.FetchPost) ([]structs.ReturnPost, error) {
+func GetAllPosts() ([]models.Post, error) {
 
 	db, dbErr := database.DB()
 	if dbErr != nil {
@@ -42,8 +42,29 @@ func GetAllPosts(collection structs.FetchPost) ([]structs.ReturnPost, error) {
 		return nil, dbErr
 	}
 
-	iter := db.Client.Collection(collection).Documents(db.Ctx)
+	iter := db.Client.Collection("posts").Documents(db.Ctx)
+	var posts []models.Post
 
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break // Stop iterating
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		var p models.Post
+		// Decode Firestore document into struct
+		if err := doc.DataTo(&p); err != nil {
+			return nil, err
+		}
+
+		p.PostID = doc.Ref.ID
+		posts = append(posts, p)
+	}
+
+	return posts, nil
 }
 
 func GetPostByID(postID string) (models.Post, error) {

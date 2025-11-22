@@ -205,4 +205,39 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, 
 }
 
 func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+	token.UserID = token.UserID
+	allPosts, err := services.GetAllPosts()
+	if err != nil {
+		response.Error(http.StatusInternalServerError, err.Error(), w)
+		return
+	}
+
+	var posts []models.Post
+	for _, p := range allPosts {
+		var shouldAppend bool
+		shouldAppend = true
+		for _, res := range p.Responses {
+			if res.UserID == token.UserID {
+				shouldAppend = false
+			}
+		}
+
+		if shouldAppend {
+			posts = append(posts, p)
+		}
+	}
+
+	var returnPosts []structs.ReturnPost
+	for _, post := range posts {
+		returnPosts = append(returnPosts, structs.ReturnPost{
+			PostID:         post.PostID,
+			Topic:          post.Topic,
+			Title:          post.Title,
+			Subject:        post.Subject,
+			SubjectCode:    post.SubjectCode,
+			ExpirationDate: post.ExpirationDate,
+		})
+	}
+
+	response.Object(http.StatusOK, returnPosts, w)
 }
