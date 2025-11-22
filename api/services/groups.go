@@ -124,7 +124,7 @@ func GetGroupByID(groupID string) (models.Group, error) {
 	}
 
 	var group models.Group
-	if userSnapErr := userSnap.DataTo(&group); userErr != nil {
+	if userSnapErr := userSnap.DataTo(&group); userSnapErr != nil {
 		return models.Group{}, userSnapErr
 	}
 
@@ -193,6 +193,38 @@ func CreateGroup(post models.Post, dittoUsers, assistUsers, participants []strin
 	_, docErr := docRef.Get(db.Ctx)
 
 	return docErr
+}
+
+func GetMessageByID(messageID string) (models.Message, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return models.Message{}, dbErr
+	}
+
+	messageRef := db.Client.Collection("messages").Doc(messageID)
+	userSnap, userErr := messageRef.Get(db.Ctx)
+
+	if userErr != nil {
+		return models.Message{}, userErr
+	}
+
+	var message models.Message
+	if userSnapErr := userSnap.DataTo(&message); userSnapErr != nil {
+		return models.Message{}, userSnapErr
+	}
+
+	message.GroupID = messageRef.ID
+	return message, nil
+}
+
+func UpdateMessageReply(messageID string, message models.Message) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	_, updateErr := db.Client.Collection("messages").Doc(messageID).Set(db.Ctx, message)
+	return updateErr
 }
 
 func AddNewGroupMember(groupID, userID, answer string) error {

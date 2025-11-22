@@ -61,3 +61,31 @@ func CreateMeetupSuggestion(r *http.Request, w http.ResponseWriter, params map[s
 
 	controller.CreateMeetupSuggestion(r, w, &token, message)
 }
+
+func AnswerMeetupSuggestion(r *http.Request, w http.ResponseWriter, params map[string]string) {
+
+	accept := struct {
+		Accept bool `json:"accept"`
+	}{}
+	if unmarshalErr := json.NewDecoder(r.Body).Decode(&accept); unmarshalErr != nil {
+		response.Error(http.StatusBadRequest, "Invalid input", w)
+		return
+	}
+
+	groupID := params["groupID"]
+	messageID := params["messageID"]
+
+	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
+		response.Error(http.StatusTooManyRequests, "Too many requests", w)
+		return
+	}
+
+	token, tokenErr := auth.IsUserAuth(r)
+	if tokenErr != nil {
+		fmt.Print(tokenErr)
+		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
+		return
+	}
+
+	controller.AnswerMeetupSuggestion(r, w, &token, accept.Accept, groupID, messageID)
+}

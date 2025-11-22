@@ -5,6 +5,7 @@ import (
 	//	"fmt"
 
 	"net/http"
+	"reflect"
 	"slices"
 	"studygroup_api/models"
 	"studygroup_api/response"
@@ -90,5 +91,63 @@ func CreateMeetupSuggestion(r *http.Request, w http.ResponseWriter, token *struc
 	}
 
 	response.Message(http.StatusOK, "Meetup-suggestion created", w)
+
+}
+
+func AnswerMeetupSuggestion(r *http.Request, w http.ResponseWriter, token *structs.Token, accept bool, groupID, messageID string) {
+	userID := token.UserID
+
+	group, groupErr := services.GetGroupByID(groupID)
+	if groupErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
+	}
+
+	if !slices.Contains(group.Participants, userID) {
+		response.Error(http.StatusConflict, "You are not part of this group", w)
+		return
+	}
+
+	message, messageErr := services.GetMessageByID(messageID)
+	if messageErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
+	}
+
+	if reflect.DeepEqual(message, models.Message{}) {
+		response.Error(http.StatusNotFound, "Message not found", w)
+		return
+	}
+
+	var usersAgreed []string
+	var UsersDecline []string
+
+	for _, au := range message.UsersAgreed {
+		if au != userID {
+			usersAgreed = append(usersAgreed, au)
+		}
+	}
+
+	for _, ud := range message.UsersDecline {
+		if ud != userID {
+			UsersDecline = append(UsersDecline, ud)
+		}
+	}
+
+	if accept {
+		usersAgreed = append(usersAgreed, userID)
+	} else {
+		UsersDecline = append(UsersDecline, userID)
+	}
+
+	message.UsersAgreed = usersAgreed
+	message.UsersDecline = UsersDecline
+
+	if updateErr := services.UpdateMessageReply(messageID, message); updateErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
+	}
+
+	response.Message(http.StatusOK, "Answer submitted!", w)
 
 }
