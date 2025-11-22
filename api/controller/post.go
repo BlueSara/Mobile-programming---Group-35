@@ -204,6 +204,13 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, 
 	response.Message(http.StatusOK, "Answer updated!", w)
 }
 
+// GetALlPosts returns all posts the authenticated user has not yet responded to.
+// It retrieves all posts from Firestore, filters out those containing a response
+// from the requesting user, and returns the remaining posts.
+//
+// @Params r: the incoming HTTP request
+// @Params w: the HTTP response writer used to return data to the client
+// @Params token: the authenticated user's token, containing the user's ID
 func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 	token.UserID = token.UserID
 	allPosts, err := services.GetAllPosts()

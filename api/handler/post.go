@@ -111,6 +111,14 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, params map[string]stri
 	controller.UpdateAnswer(r, w, &token, postID, answer)
 }
 
+// GetAllPosts handles requests to fetch all posts available to the authenticated
+// user. It applies rate limiting, verifies authentication, and then delegates
+// the request to the controller.
+//
+// Parameters:
+//   - r: incoming HTTP request
+//   - w: HTTP response writer
+//   - params: route parameters (unused)
 func GetAllPosts(r *http.Request, w http.ResponseWriter, params map[string]string) {
 	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
 		response.Error(http.StatusTooManyRequests, "Too many requests", w)

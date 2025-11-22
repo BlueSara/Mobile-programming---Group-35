@@ -34,6 +34,7 @@ func InsertNewPost(post models.Post) (string, error) {
 	return newPost.PostID, nil
 }
 
+// GetAllPosts loads all posts from Firestore and returns them.
 func GetAllPosts() ([]models.Post, error) {
 
 	db, dbErr := database.DB()
