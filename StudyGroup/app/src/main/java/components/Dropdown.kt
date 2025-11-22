@@ -1,6 +1,7 @@
 package components
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -57,6 +58,7 @@ fun DropDown(
         modifier = Modifier
             .fillMaxWidth()
             .padding(0.dp)
+            .background(colors.background)
             .clip(
                 shape = RoundedCornerShape(
                     topStart = 0.dp,
@@ -66,7 +68,7 @@ fun DropDown(
                 )
             )
             .border(
-                width = 0.dp, color = colors.white, RoundedCornerShape(
+                width = 1.dp, color = colors.borderColor, RoundedCornerShape(
                     topStart = 0.dp,
                     topEnd = 0.dp,
                     bottomStart = 4.dp,
@@ -106,7 +108,7 @@ fun DropDown(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "${it["code"] ?: it["abbr"] ?: ""} - ${it["name"]?: ""}",
+                            text = "${it["subjectCode"] ?: it["studyProgramAbbr"] ?: ""} - ${it["subjectName"]?: it["studyProgramName"]?: ""}",
                             fontWeight = FontWeight.Normal,
                             fontSize = 18.sp
                         )
@@ -167,7 +169,7 @@ fun DropDown(
 @Composable
 fun PreviewDropDown(){
     //some mockup data
-    val someList : MutableList<Map<String, Any>> = mutableListOf(
+    val someList : MutableList<Map<String, String>> = mutableListOf(
         mapOf(
             "id" to "someID1",
             "code" to "someCode1",
@@ -218,7 +220,7 @@ fun PreviewDropDown(){
         //updating the options that can be selected from based on text-field value
         options = if (value != ""){
             someList
-                .filter { (it["code"] as? String)
+                .filter { (it["code"])
                     ?.lowercase()
                     ?.contains(value) == true
                 }

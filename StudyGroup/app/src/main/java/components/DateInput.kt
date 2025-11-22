@@ -74,7 +74,7 @@ fun DateInput(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = space.m)
+            .padding(bottom = space.xl)
             .background(colors.background)
     ){
         Box(

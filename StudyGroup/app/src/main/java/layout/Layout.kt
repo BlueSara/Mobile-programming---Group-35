@@ -45,6 +45,12 @@ fun Layout(
         }
     }
 
+    /**For signing out user. removes stored token used with api */
+    fun handleSignOut(){
+        //TODO : ADD LOGIC TO SIGN OUT USER, E.G. REMOVE TOKEN FROM STORAGE
+        navigate("signUpCredentials")
+    }
+
     val colors = LocalCustomColors.current
     val space = LocalSpacing.current
 
@@ -99,7 +105,8 @@ fun Layout(
                 if (showMenu.value){
                     DropdownMenu(
                         onDismiss = {showMenu.value = false},
-                        onNavigate = { screen -> navigate(screen)})
+                        onNavigate = { screen -> navigate(screen)},
+                        onSignout = {handleSignOut()})
                 }
             }
         }
