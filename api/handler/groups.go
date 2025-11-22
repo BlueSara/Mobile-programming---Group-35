@@ -9,7 +9,7 @@ import (
 	"studygroup_api/response"
 )
 
-func GetPosts(r *http.Request, w http.ResponseWriter, params map[string]string) {
+func GetGroups(r *http.Request, w http.ResponseWriter, params map[string]string) {
 
 	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
 		response.Error(http.StatusTooManyRequests, "Too many requests", w)
@@ -23,5 +23,5 @@ func GetPosts(r *http.Request, w http.ResponseWriter, params map[string]string) 
 		return
 	}
 
-	controller.GetPosts(r, w, &token)
+	controller.GetGroups(r, w, &token)
 }

@@ -1,59 +1,49 @@
 package controller
 
 import (
-	
-	"encoding/json"
-//	"fmt"
+
+	//	"fmt"
 	"net/http"
+	"studygroup_api/models"
 	"studygroup_api/response"
 	"studygroup_api/services"
 	"studygroup_api/structs"
-//	"studygroup_api/utils"
+
+	"github.com/golang-jwt/jwt/v4"
+	// "studygroup_api/utils"
 )
 
-func GetPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+func GetGroups(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 
-	unparsedGroups, getErr := services.GetAllDocs("groups")
+	groups, getErr := services.GetGroups(token.UserID)
 	if getErr != nil {
-		response.Error(http.StatusNotFound, "The referenced subject was not found", w)
+		response.Error(http.StatusInternalServerError, "The referenced subject was not found", w)
 		return
 	}
 
-	// Convert the retrieved document to json ...
-	temp, err2 := json.Marshal(unparsedGroups)
-	if err2 != nil {
-		http.Error(w, "Something went wrong when parsing document", http.StatusInternalServerError)
-		return
-	}
-
-	// ... and convert it back into a formatted struct
-	var groups []struct {Participants []string `json:"participants"`}
-	json.Unmarshal(temp, &groups)
-	
-	// real data from database for testing without tokens
-	//var dummy string = "dFECXP03rIxMvdortonf"
-
-	// output data
-	var out []map[string]interface{}
-	
-	// for all indices and group in the list of groups (all group documents from firebase) ...
-	for i, group := range groups {
-
-		// ... loop over all participants in the group ...
-		for _, id := range group.Participants {
-
-			// ... and add the group to the output object if the participant is the current user
-			if id == token.UserID {//dummy {
-				out = append(out, unparsedGroups[i])
-				break // break out of inner for loop, we do not care about other participants
-			}
+	//getting the post for each of the groups
+	var posts []models.Post
+	for _, g := range groups {
+		post, postErr := services.GetPostByID(g.PostID)
+		if postErr != nil {
+			response.Error(http.StatusInternalServerError, postErr.Error(), w)
+			return
 		}
+		posts = append(posts, post)
 	}
 
-	// return error if no groups
-	if len(out) == 0 {
-		http.Error(w, "no groups found", http.StatusNotFound)
-		return
+	//iterating over post and structuring content to return
+	var out []map[string]any
+	for i, post := range posts {
+		group := groups[i]
+		out = append(out, jwt.MapClaims{
+			"postID":  group.PostID,
+			"groupID": group.GroupID,
+			"topic":   post.Topic,
+			"subject": post.Subject,
+			"title":   post.Title,
+		})
 	}
+
 	response.Object(http.StatusOK, out, w)
 }

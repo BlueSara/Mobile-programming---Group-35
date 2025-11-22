@@ -26,13 +26,48 @@ func GetAllDocs(collection string) ([]map[string]interface{}, error) {
 		if err != nil {
 			break // Stop iterating if no more documents
 		}
-		
+
 		registrations = append(registrations, doc.Data()) // Add the document data to the result slice
 	}
 	// Returning all the documents that have been added to registrations.
 	return registrations, nil
 }
 
+// getting all groups relative to the user
+func GetGroups(userID string) ([]models.Group, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return []models.Group{}, dbErr
+	}
+
+	//finding groups where current user is a participant
+	iter := db.Client.Collection("groups").Where("participants", "array-contains", userID).Documents(db.Ctx)
+	defer iter.Stop()
+
+	var groups []models.Group
+
+	for {
+		document, documentErr := iter.Next()
+
+		if documentErr != nil {
+			if documentErr == iterator.Done {
+				break
+			}
+			return []models.Group{}, documentErr
+		}
+
+		var group models.Group
+		if docErr := document.DataTo(&group); docErr != nil {
+			return groups, docErr
+		}
+
+		group.GroupID = document.Ref.ID
+		groups = append(groups, group)
+	}
+
+	return groups, nil
+
+}
 
 func GetGroupByID(postID string) (models.Group, error) {
 	db, dbErr := database.DB()
