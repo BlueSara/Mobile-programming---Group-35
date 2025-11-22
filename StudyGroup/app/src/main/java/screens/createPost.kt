@@ -2,13 +2,10 @@ package screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
@@ -20,18 +17,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.studygroup.ui.theme.LocalSpacing
 import components.AppButton
 import components.ButtonType
 import components.DateInput
+import components.PageHeadline
 import components.Select
-import components.TextInput
-import layout.Footer
-import layout.Header
+import components.TextArea
 import layout.Layout
 import java.time.LocalDate
 
@@ -54,8 +49,6 @@ val mockUpSubjects:List<Map<String,String>> =  listOf(
     ),
 )
 
-
-
 @Composable
 @Preview(showBackground = true)
 fun CreatePost(
@@ -63,14 +56,20 @@ fun CreatePost(
     val availableSubjects = mockUpSubjects // TODO: USE REAL DATA
     var mSelectedSubject by remember { mutableStateOf("") }
     var mTopic by remember { mutableStateOf("") }
-    var mAbbreviation by remember { mutableStateOf("") }
     var mExpirationDate by remember { mutableStateOf(LocalDate.now()) }
     var mUseLocation by remember { mutableStateOf(true) }
+
+    val space = LocalSpacing.current
+
+    fun handlePushingPost(){
+        //TODO : ADD LOGIC TO VALIDATE AND PUBLISH POST (API)
+    }
 
 
     Layout(
         navController= navController,
         showFilter = true,
+        pageDetails = { PageHeadline(text = "Create post") },
         content =  {
             Column(
                 modifier = Modifier
@@ -81,16 +80,10 @@ fun CreatePost(
                     onChange = { mSelectedSubject = it },
                     options = availableSubjects
                 )
-                TextInput(
+                TextArea(
                     value = mTopic,
                     onChange = { mTopic = it },
-                    label = "Assignment/topic"
-                )
-                TextInput(
-                    value = mAbbreviation,
-                    onChange = { mAbbreviation = it },
-                    label = "Study program abbreviation"
-                )
+                    label = "Assignment/topic")
 
                 DateInput(
                     date = mExpirationDate,
@@ -99,23 +92,26 @@ fun CreatePost(
                 )
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(space.s),
                     modifier = Modifier
+                        .fillMaxWidth()
                         // make entire row clickable so users may tap the label
                         .clickable(
                             onClick = { mUseLocation = !mUseLocation },
                             role = Role.Checkbox
                         )
                 ) {
+
                     Checkbox(
+                        modifier = Modifier
+                            .width(space.m)
+                            .height(space.m),
                         checked = mUseLocation,
                         onCheckedChange = { mUseLocation = !mUseLocation },
-                        enabled = mUseLocation
                     )
 
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(text = "Visible only to those close to your location",fontSize = 16.sp)
+                    Text(text = "Visible only to those close to your location",fontSize = 18.sp)
                 }
             }
 
@@ -124,20 +120,19 @@ fun CreatePost(
         footer = {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(space.xs)
             ) {
                 AppButton(
                     modifier = Modifier.weight(1f),
                     text = "Cancel",
-                    onClick = { /* TODO */ },
+                    onClick = { navController?.navigate("home") },
                     type = ButtonType.DANGER
                 )
                 AppButton(
                     modifier = Modifier.weight(1f),
                     text = "Publish",
-                    onClick = { /* TODO */ }
+                    onClick = { handlePushingPost() }
                 )
             }
         }
