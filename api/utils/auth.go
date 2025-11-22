@@ -26,8 +26,6 @@ func CreateToken(user models.User) (string, error) {
 		University:   user.UniversityID,
 		Subjects:     user.Subjects,
 		StudyProgram: user.StudyProgram,
-		Posts:        user.Posts,
-		Responses:    user.Responses,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().AddDate(0, 1, 0)),
 			Issuer:    tokenIssuer,

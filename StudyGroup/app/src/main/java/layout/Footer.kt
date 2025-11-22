@@ -24,7 +24,7 @@ fun Footer(footer: (@Composable (() -> Unit))? = null){
     Row(
         modifier = Modifier
             .background(colors.foreground)
-            .padding(space.s)
+            .padding(top = space.m, start = space.s, end = space.s, bottom = space.m)
             .fillMaxWidth()
             .shadow(elevation = space.xl, shape = RectangleShape),
         horizontalArrangement = Arrangement.spacedBy(space.xs)

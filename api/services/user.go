@@ -58,3 +58,23 @@ func UpdateUsersPosts(userID, postID string) error {
 
 	return insertErr
 }
+
+func FindUserByID(userID string) (models.User, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return models.User{}, dbErr
+	}
+
+	userRef := db.Client.Collection("users").Doc(userID)
+	userSnap, userErr := userRef.Get(db.Ctx)
+	if userErr != nil {
+		return models.User{}, userErr
+	}
+
+	var user models.User
+	if userSnapErr := userSnap.DataTo(&user); userErr != nil {
+		return models.User{}, userSnapErr
+	}
+
+	return user, nil
+}
