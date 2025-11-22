@@ -66,10 +66,73 @@ func GetGroups(userID string) ([]models.Group, error) {
 	}
 
 	return groups, nil
-
 }
 
-func GetGroupByID(postID string) (models.Group, error) {
+func InsertMessage(message models.Message) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	_, _, docRefErr := db.Client.Collection("messages").Add(db.Ctx, message)
+	return docRefErr
+}
+
+func GetGroupMessages(groupID string) ([]models.Message, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return []models.Message{}, dbErr
+	}
+
+	iter := db.Client.Collection("messages").Where("groupID", "==", groupID).Documents(db.Ctx)
+	defer iter.Stop()
+
+	var messages []models.Message
+
+	for {
+		document, documentErr := iter.Next()
+
+		if documentErr != nil {
+			if documentErr == iterator.Done {
+				break
+			}
+			return []models.Message{}, documentErr
+		}
+
+		var message models.Message
+		message.MessageID = document.Ref.ID
+		if docErr := document.DataTo(&message); docErr != nil {
+			return messages, docErr
+		}
+
+		messages = append(messages, message)
+	}
+
+	return messages, nil
+}
+
+func GetGroupByID(groupID string) (models.Group, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return models.Group{}, dbErr
+	}
+
+	groupRef := db.Client.Collection("groups").Doc(groupID)
+	userSnap, userErr := groupRef.Get(db.Ctx)
+	if userErr != nil {
+		return models.Group{}, userErr
+	}
+
+	var group models.Group
+	if userSnapErr := userSnap.DataTo(&group); userErr != nil {
+		return models.Group{}, userSnapErr
+	}
+
+	group.GroupID = groupRef.ID
+	return group, nil
+}
+
+func GetGroupByPostID(postID string) (models.Group, error) {
 	db, dbErr := database.DB()
 	if dbErr != nil {
 		return models.Group{}, dbErr

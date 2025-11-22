@@ -52,15 +52,15 @@ type Group struct {
 // struct to use with db for storing messages sent in groups
 // MessageID should be empty when inserting/updating in db
 type Message struct {
-	MessageID    string                   `firestore:"messageID,omitempty"`
-	GroupID      *firestore.DocumentRef   `firestore:"groupID"`
-	PostID       *firestore.DocumentRef   `firestore:"postID"`
-	Time         time.Time                `firestore:"time"`
-	Location     string                   `firestore:"location"`
-	Building     string                   `firestore:"building"`
-	Room         string                   `firestore:"room"`
-	Comment      string                   `firestore:"comment"`
-	UsersAgreed  []*firestore.DocumentRef `firestore:"usersAgreed"`
-	UsersDecline []*firestore.DocumentRef `firestore:"usersDecline"`
-	IsSelected   bool                     `firestore:"isSelected"`
+	MessageID    string    `firestore:"messageID,omitempty"`
+	UserID       string    `firestore:"userID"`
+	GroupID      string    `firestore:"groupID"`
+	Time         time.Time `firestore:"time"`
+	Location     string    `firestore:"location"`
+	Building     string    `firestore:"building"`
+	Room         string    `firestore:"room"`
+	Comment      string    `firestore:"comment"`
+	UsersAgreed  []string  `firestore:"usersAgreed"`
+	UsersDecline []string  `firestore:"usersDecline"`
+	IsSelected   bool      `firestore:"isSelected"`
 }

@@ -27,6 +27,7 @@ func main() {
 	routes.Register("/post/groups", "GET", handler.GetGroups)
 	routes.Register("/post/:postID/answer", "PATCH", handler.AnswerPost)
 	routes.Register("/post/:postID/update", "PATCH", handler.UpdateAnswer)
+	routes.Register("groups/:groupID", "POST", handler.CreateMeetupSuggestion)
 
 	port := ":3000"
 
