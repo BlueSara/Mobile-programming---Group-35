@@ -109,3 +109,24 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, params map[string]stri
 
 	controller.UpdateAnswer(r, w, &token, postID, answer)
 }
+
+func EditPost(r *http.Request, w http.ResponseWriter, params map[string]string) {
+	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
+		response.Error(http.StatusTooManyRequests, "Too many requests", w)
+		return
+	}
+	
+	token, tokenErr := auth.IsUserAuth(r)
+	if tokenErr != nil {
+		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
+		return
+	}
+
+	var post structs.Post
+	if unmarshalErr := json.NewDecoder(r.Body).Decode(&post); unmarshalErr != nil {
+		response.Error(http.StatusBadRequest, "Invalid input", w)
+		return
+	}
+
+	controller.EditPost(r, w, &token, params["postID"], post)
+}
