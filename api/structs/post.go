@@ -33,10 +33,16 @@ type ReturnPost struct {
 }
 
 // struct used when a user is creating a meetup suggestion
-type Meetup struct {
-	Time     time.Time `json:"time" validate:"len=20,required"`
-	Location string    `json:"location" validate:"min=4,max=75,required"`
-	Building string    `json:"building" validate:"min=0,max=30"`
-	Room     string    `json:"room" validate:"min=0,max=30"`
-	Comment  string    `json:"comment" validate:"min=0,max=150"`
+type Message struct {
+	MessageID    string    `json:"meetupID"`
+	GroupID      string    `json:"groupID" validate:"len=20,required"`
+	UserID       string    `json:"userID"`
+	Time         time.Time `json:"time" validate:"required"`
+	Location     string    `json:"location" validate:"min=4,max=75,required"`
+	Building     string    `json:"building" validate:"min=0,max=30"`
+	Room         string    `json:"room" validate:"min=0,max=30"`
+	Comment      string    `json:"comment" validate:"min=0,max=150"`
+	UsersAgreed  []string  `json:"usersAgreed"`
+	UsersDecline []string  `json:"usersDecline"`
+	IsSelected   bool      `json:"isSelected"`
 }
