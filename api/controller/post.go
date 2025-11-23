@@ -100,7 +100,7 @@ func AnswerPost(r *http.Request, w http.ResponseWriter, token *structs.Token, po
 		return
 	}
 
-	group, groupErr := services.GetGroupByID(postID)
+	group, groupErr := services.GetGroupByPostID(postID)
 	if groupErr != nil {
 		response.Error(http.StatusInternalServerError, "Internal server error finding groupd", w)
 		return
@@ -174,7 +174,7 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, 
 
 	//response.Object(http.StatusOK, updatedPost, w)
 
-	group, groupErr := services.GetGroupByID(postID)
+	group, groupErr := services.GetGroupByPostID(postID)
 	if groupErr != nil {
 		response.Error(http.StatusInternalServerError, "Internal server error finding groupd", w)
 		return
