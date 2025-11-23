@@ -242,3 +242,47 @@ func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, post
 	}
 	response.Message(http.StatusOK, "Answer updated!", w)
 }
+// GetALlPosts returns all posts the authenticated user has not yet responded to.
+// It retrieves all posts from Firestore, filters out those containing a response
+// from the requesting user, and returns the remaining posts.
+//
+// @Params r: the incoming HTTP request
+// @Params w: the HTTP response writer used to return data to the client
+// @Params token: the authenticated user's token, containing the user's ID
+func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+	token.UserID = token.UserID
+	allPosts, err := services.GetAllPosts()
+	if err != nil {
+		response.Error(http.StatusInternalServerError, err.Error(), w)
+		return
+	}
+
+	var posts []models.Post
+	for _, p := range allPosts {
+		var shouldAppend bool
+		shouldAppend = true
+		for _, res := range p.Responses {
+			if res.UserID == token.UserID {
+				shouldAppend = false
+			}
+		}
+
+		if shouldAppend {
+			posts = append(posts, p)
+		}
+	}
+
+	var returnPosts []structs.ReturnPost
+	for _, post := range posts {
+		returnPosts = append(returnPosts, structs.ReturnPost{
+			PostID:         post.PostID,
+			Topic:          post.Topic,
+			Title:          post.Title,
+			Subject:        post.Subject,
+			SubjectCode:    post.SubjectCode,
+			ExpirationDate: post.ExpirationDate,
+		})
+	}
+
+	response.Object(http.StatusOK, returnPosts, w)
+}

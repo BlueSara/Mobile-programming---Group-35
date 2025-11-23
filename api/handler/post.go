@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"studygroup_api/controller"
 	"studygroup_api/middleware/auth"
@@ -111,22 +112,42 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, params map[string]stri
 }
 
 func EditPost(r *http.Request, w http.ResponseWriter, params map[string]string) {
-	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
-		response.Error(http.StatusTooManyRequests, "Too many requests", w)
-		return
-	}
-	
 	token, tokenErr := auth.IsUserAuth(r)
 	if tokenErr != nil {
 		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
 		return
 	}
-
 	var post structs.Post
 	if unmarshalErr := json.NewDecoder(r.Body).Decode(&post); unmarshalErr != nil {
 		response.Error(http.StatusBadRequest, "Invalid input", w)
 		return
 	}
-
+	
 	controller.EditPost(r, w, &token, params["postID"], post)
+}
+
+// GetAllPosts handles requests to fetch all posts available to the authenticated
+// user. It applies rate limiting, verifies authentication, and then delegates
+// the request to the controller.
+//
+// Parameters:
+//   - r: incoming HTTP request
+//   - w: HTTP response writer
+//   - params: route parameters (unused)
+func GetAllPosts(r *http.Request, w http.ResponseWriter, params map[string]string) {
+	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
+		response.Error(http.StatusTooManyRequests, "Too many requests", w)
+		return
+	}
+	
+
+	token, tokenErr := auth.IsUserAuth(r)
+	if tokenErr != nil {
+		fmt.Print(tokenErr)
+		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
+		return
+	}
+
+	controller.GetALlPosts(r, w, &token)
+
 }
