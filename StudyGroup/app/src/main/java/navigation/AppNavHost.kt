@@ -15,8 +15,8 @@ import screens.Signin
 import screens.SignupCredentials
 import screens.SignupUniversity
 import screens.UserAccount
-import screens.UserPosts
 import screens.UserReplies
+import screens.UserPosts
 
 @Composable
 fun AppNavHost(){
