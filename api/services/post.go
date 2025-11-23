@@ -168,3 +168,29 @@ func InsertPostReply(postID, userID, answer string) error {
 
 	return insertUserErr
 }
+
+// DeletePost removes a post and updates its owner's post list.
+func DeletePost(postID string) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	// Fetch the post
+	post, err := GetPostByID(postID)
+	if err != nil {
+		return err
+	}
+
+	// Remove the post
+	_, err = db.Client.Collection("users").Doc(*post.UserID).Update(db.Ctx, []firestore.Update{
+		{Path: "posts", Value: firestore.ArrayRemove(postID)},
+	})
+	if err != nil {
+		return err
+	}
+
+	// Delete the actual post
+	_, err = db.Client.Collection("posts").Doc(postID).Delete(db.Ctx)
+	return err
+}

@@ -132,6 +132,25 @@ func GetAllPosts(r *http.Request, w http.ResponseWriter, params map[string]strin
 		return
 	}
 
-	controller.GetALlPosts(r, w, &token)
+	controller.GetAllPosts(r, w, &token)
 
+}
+
+func DeletePost(r *http.Request, w http.ResponseWriter, params map[string]string) {
+	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
+		response.Error(http.StatusTooManyRequests, "Too many requests", w)
+		return
+	}
+	postID := params["postID"]
+	if len(postID) > 22 || len(postID) < 19 {
+		response.Error(http.StatusBadRequest, "Invalid post indentification", w)
+		return
+	}
+	token, tokenErr := auth.IsUserAuth(r)
+	if tokenErr != nil {
+		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
+		return
+	}
+
+	controller.DeletePost(r, w, &token, postID)
 }

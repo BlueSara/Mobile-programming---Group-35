@@ -204,14 +204,14 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, 
 	response.Message(http.StatusOK, "Answer updated!", w)
 }
 
-// GetALlPosts returns all posts the authenticated user has not yet responded to.
+// GetAllPosts returns all posts the authenticated user has not yet responded to.
 // It retrieves all posts from Firestore, filters out those containing a response
 // from the requesting user, and returns the remaining posts.
 //
 // @Params r: the incoming HTTP request
 // @Params w: the HTTP response writer used to return data to the client
 // @Params token: the authenticated user's token, containing the user's ID
-func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+func GetAllPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 	token.UserID = token.UserID
 	allPosts, err := services.GetAllPosts()
 	if err != nil {
@@ -247,4 +247,28 @@ func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 	}
 
 	response.Object(http.StatusOK, returnPosts, w)
+}
+
+func DeletePost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID string) {
+
+	// Load the selected post
+	post, err := services.GetPostByID(postID)
+	if err != nil {
+		response.Error(http.StatusNotFound, "Post not found", w)
+		return
+	}
+
+	// Authorization if the user owns the post
+	if *post.UserID != token.UserID {
+		response.Error(http.StatusForbidden, "You cannot delete this post", w)
+		return
+	}
+
+	// Delete the post
+	if err := services.DeletePost(post.PostID); err != nil {
+		response.Error(http.StatusInternalServerError, "Failed to delete post", w)
+	}
+
+	response.Message(http.StatusOK, "Post deleted!", w)
+
 }
