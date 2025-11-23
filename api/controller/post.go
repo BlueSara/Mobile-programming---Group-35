@@ -249,6 +249,14 @@ func GetAllPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 	response.Object(http.StatusOK, returnPosts, w)
 }
 
+// DeletePost handles deletion of a post owned by the authenticated user.
+// It loads the post, checks the ownership and removed it with
+// services.DeletePost.
+//
+// @Param r: incoming HTTP request
+// @Param w: HTTP response writer
+// @Param token: authenticated users token (containing UserID)
+// @Param postID: ID of the post to be deleted
 func DeletePost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID string) {
 
 	// Load the selected post
@@ -264,11 +272,11 @@ func DeletePost(r *http.Request, w http.ResponseWriter, token *structs.Token, po
 		return
 	}
 
-	// Delete the post
+	// Delete the post with services.DeletePost
 	if err := services.DeletePost(post.PostID); err != nil {
 		response.Error(http.StatusInternalServerError, "Failed to delete post", w)
 	}
-
+	
 	response.Message(http.StatusOK, "Post deleted!", w)
 
 }

@@ -169,20 +169,27 @@ func InsertPostReply(postID, userID, answer string) error {
 	return insertUserErr
 }
 
-// DeletePost removes a post and updates its owner's post list.
+// DeletePost deletes a post from Firestore and removes its ID from the owners lists of Posts.
+// The function first loads the post to determine the owner, update the users posts array,
+// and then deletes the post document itself
+//
+// @Param PostID: ID of the post to remove
+//
+// @Return error: Error if any Firestore operations fail.
 func DeletePost(postID string) error {
+	// Getting the Firestore DB client
 	db, dbErr := database.DB()
 	if dbErr != nil {
 		return dbErr
 	}
 
-	// Fetch the post
+	// Load the post to find its owner
 	post, err := GetPostByID(postID)
 	if err != nil {
 		return err
 	}
 
-	// Remove the post
+	// Remove the postID from the owners posts list
 	_, err = db.Client.Collection("users").Doc(*post.UserID).Update(db.Ctx, []firestore.Update{
 		{Path: "posts", Value: firestore.ArrayRemove(postID)},
 	})
