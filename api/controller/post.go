@@ -205,7 +205,6 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, 
 }
 
 // GetAllPosts returns all posts the authenticated user has not yet responded to.
-
 func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID string, newPostData structs.Post) {
 	post, getErr := services.GetPostByID(postID)
 	if getErr != nil {
@@ -319,4 +318,32 @@ func DeletePost(r *http.Request, w http.ResponseWriter, token *structs.Token, po
 
 	response.Message(http.StatusOK, "Post deleted!", w)
 
+}
+
+// row 14 in docs
+func GetRepliedPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+	userID := token.UserID
+
+	posts, errGetPosts := services.GetAllPosts()
+	if errGetPosts != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
+	}
+
+	var output []models.Post
+	for _, post := range posts {
+		for _, resp := range post.Responses {
+			if resp.UserID == userID {
+				output = append(output, post)
+			}
+		}
+	}
+
+	// return no content on empty list
+	if len(output) == 0 {
+		response.Empty(w)
+		return
+	}
+
+	response.Object(http.StatusOK, output, w)
 }
