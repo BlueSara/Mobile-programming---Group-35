@@ -61,7 +61,7 @@ fun CardSmall(
         "response" to "ditto",
     )
 
-    val borderColor = when(data["response"]){
+    val borderColor = when(data["response"].toString().lowercase()){
         "ditto" -> colors.primary
         "assist" -> colors.success
         "skip" -> colors.danger
