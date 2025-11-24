@@ -66,7 +66,6 @@ fun CardMessage(
 
     val buttonColor = when(data["userAgreed"]){
         true -> colors.danger
-        false -> colors.success
         else -> colors.success
     }
 

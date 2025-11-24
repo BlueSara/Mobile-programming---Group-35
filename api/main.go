@@ -28,11 +28,12 @@ func main() {
 	routes.Register("/post/groups", "GET", handler.GetGroups)
 	routes.Register("/post/:postID/answer", "PATCH", handler.AnswerPost)
 	routes.Register("/post/:postID/update", "PATCH", handler.UpdateAnswer)
+	routes.Register("/post/:postID", "DELETE", handler.DeletePost)
 	routes.Register("/posts/:postID", "PUT", handler.EditPost)
 	routes.Register("groups/:groupID", "POST", handler.CreateMeetupSuggestion)
 	routes.Register("groups/:groupID/messages/:messageID", "PATCH", handler.AnswerMeetupSuggestion)
 	routes.Register("/groups/:groupID", "GET", handler.GetSingleGroupData) // row 17
-	routes.Register("/posts/replied", "GET", handler.GetRepliedPosts) // row 14
+	routes.Register("/posts/replied", "GET", handler.GetRepliedPosts)      // row 14
 
 	port := ":3000"
 

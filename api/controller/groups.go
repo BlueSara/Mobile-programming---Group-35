@@ -152,17 +152,14 @@ func AnswerMeetupSuggestion(r *http.Request, w http.ResponseWriter, token *struc
 
 }
 
-
-
 // row 17 in docs
 func GetSingleGroupData(r *http.Request, w http.ResponseWriter, token *structs.Token, groupID string) {
-	
+
 	docs, errGetDocs := services.GetAllDocs("messages")
 	if errGetDocs != nil {
 		response.Error(http.StatusInternalServerError, "Internal server error", w)
 		return
 	}
-
 
 	// gets all documents that contains groupID
 	var output []map[string]interface{}
@@ -171,12 +168,12 @@ func GetSingleGroupData(r *http.Request, w http.ResponseWriter, token *structs.T
 			output = append(output, doc)
 		}
 	}
-	
+
 	// return no content on empty list
 	if len(output) == 0 {
 		response.Empty(w)
-		return 
+		return
 	}
-	
+
 	response.Object(http.StatusOK, output, w)
 }

@@ -204,9 +204,9 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, 
 	response.Message(http.StatusOK, "Answer updated!", w)
 }
 
-
+// GetAllPosts returns all posts the authenticated user has not yet responded to.
 func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID string, newPostData structs.Post) {
-	post, getErr :=services.GetPostByID(postID)
+	post, getErr := services.GetPostByID(postID)
 	if getErr != nil {
 		response.Error(http.StatusInternalServerError, "getPostByID failed", w)
 		return
@@ -214,7 +214,7 @@ func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, post
 
 	for _, resp := range post.Responses {
 		if &resp.UserID != &token.UserID && resp.Response != "skip" {
-  			response.Error(http.StatusConflict, "Cannot update this post as others have already responded to it", w)
+			response.Error(http.StatusConflict, "Cannot update this post as others have already responded to it", w)
 			return
 		}
 	}
@@ -242,6 +242,7 @@ func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, post
 	}
 	response.Message(http.StatusOK, "Answer updated!", w)
 }
+
 // GetALlPosts returns all posts the authenticated user has not yet responded to.
 // It retrieves all posts from Firestore, filters out those containing a response
 // from the requesting user, and returns the remaining posts.
@@ -249,7 +250,7 @@ func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, post
 // @Params r: the incoming HTTP request
 // @Params w: the HTTP response writer used to return data to the client
 // @Params token: the authenticated user's token, containing the user's ID
-func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+func GetAllPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 	token.UserID = token.UserID
 	allPosts, err := services.GetAllPosts()
 	if err != nil {
@@ -287,22 +288,47 @@ func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 	response.Object(http.StatusOK, returnPosts, w)
 }
 
+// DeletePost handles deletion of a post owned by the authenticated user.
+// It loads the post, checks the ownership and removed it with
+// services.DeletePost.
+//
+// @Param r: incoming HTTP request
+// @Param w: HTTP response writer
+// @Param token: authenticated users token (containing UserID)
+// @Param postID: ID of the post to be deleted
+func DeletePost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID string) {
 
+	// Load the selected post
+	post, err := services.GetPostByID(postID)
+	if err != nil {
+		response.Error(http.StatusNotFound, "Post not found", w)
+		return
+	}
 
+	// Authorization if the user owns the post
+	if *post.UserID != token.UserID {
+		response.Error(http.StatusForbidden, "You cannot delete this post", w)
+		return
+	}
 
+	// Delete the post with services.DeletePost
+	if err := services.DeletePost(post.PostID); err != nil {
+		response.Error(http.StatusInternalServerError, "Failed to delete post", w)
+	}
 
+	response.Message(http.StatusOK, "Post deleted!", w)
+
+}
 
 // row 14 in docs
 func GetRepliedPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 	userID := token.UserID
-
 
 	posts, errGetPosts := services.GetAllPosts()
 	if errGetPosts != nil {
 		response.Error(http.StatusInternalServerError, "Internal server error", w)
 		return
 	}
-
 
 	var output []models.Post
 	for _, post := range posts {
@@ -316,7 +342,7 @@ func GetRepliedPosts(r *http.Request, w http.ResponseWriter, token *structs.Toke
 	// return no content on empty list
 	if len(output) == 0 {
 		response.Empty(w)
-		return 
+		return
 	}
 
 	response.Object(http.StatusOK, output, w)
