@@ -201,3 +201,16 @@ func DeletePost(postID string) error {
 	_, err = db.Client.Collection("posts").Doc(postID).Delete(db.Ctx)
 	return err
 }
+
+// A function that edit a document with a given id in a given collection
+// Set overwrites the document completely. Which is what we want !
+func OverwriteDoc(collection, id string, json interface{}) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	// Overwriting the content of the document with the provided ID, if not, then we return an error
+	_, errOverWrite := db.Client.Collection(collection).Doc(id).Set(db.Ctx, json)
+	return errOverWrite
+}

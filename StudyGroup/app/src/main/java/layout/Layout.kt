@@ -71,7 +71,7 @@ fun Layout(
                     //if arrow back is displayed, it should navigate to the previous page
                     //if not it should navigate to the "chats" page
                     if (arrowBack) navController?.popBackStack()
-                    else navController?.navigate("home")
+                    else navController?.navigate("allMeetups")
                 },
             )
 

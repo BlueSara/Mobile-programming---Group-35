@@ -205,6 +205,46 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, 
 }
 
 // GetAllPosts returns all posts the authenticated user has not yet responded to.
+
+func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID string, newPostData structs.Post) {
+	post, getErr := services.GetPostByID(postID)
+	if getErr != nil {
+		response.Error(http.StatusInternalServerError, "getPostByID failed", w)
+		return
+	}
+
+	for _, resp := range post.Responses {
+		if &resp.UserID != &token.UserID && resp.Response != "skip" {
+			response.Error(http.StatusConflict, "Cannot update this post as others have already responded to it", w)
+			return
+		}
+	}
+
+	subject, subjectErr := services.GetSubjectWithID(newPostData.SubjectID)
+	if subjectErr != nil {
+		response.Error(http.StatusBadRequest, subjectErr.Error(), w)
+		return
+	}
+
+	// copy over all data to the old document
+	post.Title = newPostData.Title
+	post.SubjectID = newPostData.SubjectID
+	post.Topic = newPostData.Topic
+	post.UseProximity = newPostData.UseProximity
+	post.ExpirationDate = newPostData.ExpidationDate
+	post.XCoord = newPostData.XCoord
+	post.YCoord = newPostData.YCoord
+	post.SubjectCode = subject.Code
+
+	// update the document
+	if owErr := services.OverwriteDoc("posts", postID, post); owErr != nil {
+		response.Error(http.StatusInternalServerError, "OverwriteDoc failed", w)
+		return
+	}
+	response.Message(http.StatusOK, "Answer updated!", w)
+}
+
+// GetALlPosts returns all posts the authenticated user has not yet responded to.
 // It retrieves all posts from Firestore, filters out those containing a response
 // from the requesting user, and returns the remaining posts.
 //
@@ -276,7 +316,7 @@ func DeletePost(r *http.Request, w http.ResponseWriter, token *structs.Token, po
 	if err := services.DeletePost(post.PostID); err != nil {
 		response.Error(http.StatusInternalServerError, "Failed to delete post", w)
 	}
-	
+
 	response.Message(http.StatusOK, "Post deleted!", w)
 
 }
