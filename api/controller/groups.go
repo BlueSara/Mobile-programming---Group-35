@@ -160,6 +160,7 @@ func GetSingleGroupData(r *http.Request, w http.ResponseWriter, token *structs.T
 	docs, errGetDocs := services.GetAllDocs("messages")
 	if errGetDocs != nil {
 		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
 	}
 
 
