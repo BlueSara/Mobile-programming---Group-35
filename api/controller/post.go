@@ -286,3 +286,38 @@ func GetALlPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 
 	response.Object(http.StatusOK, returnPosts, w)
 }
+
+
+
+
+
+
+// row 14 in docs
+func GetRepliedPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+	userID := token.UserID
+
+
+	posts, errGetPosts := services.GetAllPosts()
+	if errGetPosts != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
+	}
+
+
+	var output []models.Post
+	for _, post := range posts {
+		for _, resp := range post.Responses {
+			if resp.UserID == userID {
+				output = append(output, post)
+			}
+		}
+	}
+
+	// return no content on empty list
+	if len(output) == 0 {
+		response.Empty(w)
+		return 
+	}
+
+	response.Object(http.StatusOK, output, w)
+}
