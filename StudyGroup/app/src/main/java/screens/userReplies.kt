@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
@@ -68,9 +69,15 @@ val mockdata: MutableList<MutableMap<String, Any>> = mutableListOf(
 )
 //used to iterate over to create AppButtons instead of having to manually create each button
 val buttonOptions = listOf(
-    listOf("Skip", ButtonType.DANGER),
-    listOf("Ditto", ButtonType.PRIMARY),
-    listOf("Assist", ButtonType.SUCCESS),
+    mapOf(
+        "text" to "Skip",
+        "type" to ButtonType.DANGER),
+    mapOf(
+        "text" to "Ditto",
+        "type" to ButtonType.PRIMARY),
+    mapOf(
+        "text" to "Assist",
+        "type" to ButtonType.SUCCESS),
 )
 
 /**
@@ -82,7 +89,7 @@ val buttonOptions = listOf(
 fun UserReplies(
     navController: NavHostController ?=null,){
     val mSelectedPost = remember { mutableStateMapOf<String, Any>() }
-    var mAllPosts = remember { mutableListOf<Map<String, Any>>().toMutableStateList() }
+    var mAllPosts = remember { mutableStateListOf<Map<String, Any>>() }
     val space = LocalSpacing.current
 
     /**Function calling api-handler to get posts*/
@@ -132,10 +139,10 @@ fun UserReplies(
                             buttonOptions.forEach { btn ->
                                 AppButton(
                                     modifier = Modifier.weight(1f),
-                                    type = btn[1] as ButtonType,
-                                    text = btn[0].toString(),
+                                    type = btn["type"] as ButtonType,
+                                    text = btn["text"].toString(),
                                     onClick = {
-                                        handleUpdateResponse(response = btn[0].toString().lowercase())
+                                        handleUpdateResponse(response = btn["text"].toString().lowercase())
                                         mSelectedPost.clear()
                                     }
                                 )
