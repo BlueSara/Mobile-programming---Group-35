@@ -89,3 +89,23 @@ func AnswerMeetupSuggestion(r *http.Request, w http.ResponseWriter, params map[s
 
 	controller.AnswerMeetupSuggestion(r, w, &token, accept.Accept, groupID, messageID)
 }
+
+// row 17 in docs
+func GetSingleGroupData(r *http.Request, w http.ResponseWriter, params map[string]string) {
+
+	groupID := params["groupID"]
+
+	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
+		response.Error(http.StatusTooManyRequests, "Too many requests", w)
+		return
+	}
+
+	token, tokenErr := auth.IsUserAuth(r)
+	if tokenErr != nil {
+		fmt.Print(tokenErr)
+		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
+		return
+	}
+
+	controller.GetSingleGroupData(r, w, &token, groupID)
+}

@@ -5,6 +5,7 @@ import (
 	"studygroup_api/models"
 
 	"cloud.google.com/go/firestore"
+	"google.golang.org/api/iterator"
 )
 
 func InsertNewPost(post models.Post) (string, error) {
@@ -31,6 +32,40 @@ func InsertNewPost(post models.Post) (string, error) {
 	newPost.PostID = docRef.ID
 
 	return newPost.PostID, nil
+}
+
+// GetAllPosts loads all posts from Firestore and returns them.
+func GetAllPosts() ([]models.Post, error) {
+
+	db, dbErr := database.DB()
+	if dbErr != nil {
+
+		return nil, dbErr
+	}
+
+	iter := db.Client.Collection("posts").Documents(db.Ctx)
+	var posts []models.Post
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break // Stop iterating
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		var p models.Post
+		// Decode Firestore document into struct
+		if err := doc.DataTo(&p); err != nil {
+			return nil, err
+		}
+
+		p.PostID = doc.Ref.ID
+		posts = append(posts, p)
+	}
+
+	return posts, nil
 }
 
 func GetPostByID(postID string) (models.Post, error) {
@@ -132,4 +167,50 @@ func InsertPostReply(postID, userID, answer string) error {
 	})
 
 	return insertUserErr
+}
+
+// DeletePost deletes a post from Firestore and removes its ID from the owners lists of Posts.
+// The function first loads the post to determine the owner, update the users posts array,
+// and then deletes the post document itself
+//
+// @Param PostID: ID of the post to remove
+//
+// @Return error: Error if any Firestore operations fail.
+func DeletePost(postID string) error {
+	// Getting the Firestore DB client
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	// Load the post to find its owner
+	post, err := GetPostByID(postID)
+	if err != nil {
+		return err
+	}
+
+	// Remove the postID from the owners posts list
+	_, err = db.Client.Collection("users").Doc(*post.UserID).Update(db.Ctx, []firestore.Update{
+		{Path: "posts", Value: firestore.ArrayRemove(postID)},
+	})
+	if err != nil {
+		return err
+	}
+
+	// Delete the actual post
+	_, err = db.Client.Collection("posts").Doc(postID).Delete(db.Ctx)
+	return err
+}
+
+// A function that edit a document with a given id in a given collection
+// Set overwrites the document completely. Which is what we want !
+func OverwriteDoc(collection, id string, json interface{}) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	// Overwriting the content of the document with the provided ID, if not, then we return an error
+	_, errOverWrite := db.Client.Collection(collection).Doc(id).Set(db.Ctx, json)
+	return errOverWrite
 }

@@ -4,7 +4,7 @@ import "time"
 
 // struct used when a user is fetching posts
 type FetchPost struct {
-	Page   int     `json:"page"`
+	//Page   int     `json:"page"`				// Removed as we are not using pagination
 	XCoord float64 `json:"xCoord" validate:"required,min=-180,max=180"`
 	YCoord float64 `json:"yCoord" validate:"required,min=-90,max=90"`
 }
@@ -24,12 +24,12 @@ type Post struct {
 // Using this instead of "Posts" struct due to that there are
 // some fundamental structural differences and requirements
 type ReturnPost struct {
-	PostID         string `json:"postID"`
-	Title          string `json:"title"`
-	Subject        string `json:"subject"`
-	SubjectCode    string `json:"subjectCode"`
-	ExpirationDate string `json:"expirationDate"`
-	Topic          string `json:"topic"`
+	PostID         string    `json:"postID"`
+	Title          string    `json:"title"`
+	Subject        string    `json:"subject"`
+	SubjectCode    string    `json:"subjectCode"`
+	ExpirationDate time.Time `json:"expirationDate"`
+	Topic          string    `json:"topic"`
 }
 
 // struct used when a user is creating a meetup suggestion
