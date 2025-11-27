@@ -112,27 +112,6 @@ fun SignIn(
     }
 }
 
-
-
-@Composable
-fun Link(text: String){
-    val colors = LocalCustomColors.current
-    Text(
-        text = text,
-        color = colors.grey,
-        textDecoration = TextDecoration.Underline
-    )
-}
-@Composable
-fun HeadTitle(text: String){
-    Text(
-        text = text,
-        fontWeight = FontWeight.Bold,
-        fontSize = 24.sp
-    )
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewSignIn(){
