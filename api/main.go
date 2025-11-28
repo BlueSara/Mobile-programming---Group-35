@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"studygroup_api/handler"
 	"studygroup_api/routes"
 
@@ -35,11 +36,14 @@ func main() {
 	routes.Register("/groups/:groupID", "GET", handler.GetSingleGroupData) // row 17
 	routes.Register("/posts/replied", "GET", handler.GetRepliedPosts)      // row 14
 
-	port := ":3000"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
 
 	fmt.Println("Server running on port", port)
 
-	http.ListenAndServe(port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.ListenAndServe("0.0.0.0:"+port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		routes.Router(r.URL.Path, r.Method, r, w)
 	}))
 }
