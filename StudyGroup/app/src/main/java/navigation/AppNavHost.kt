@@ -11,7 +11,7 @@ import screens.CreatePost
 import screens.EditPost
 import screens.Home
 import screens.Meetup
-import screens.Signin
+import screens.SignIn
 import screens.SignupCredentials
 import screens.SignupUniversity
 import screens.UserAccount
@@ -42,7 +42,7 @@ fun AppNavHost(){
             Meetup(navController = navController)
         }
         composable("signIn"){
-            Signin(navController = navController)
+            SignIn(navController = navController)
         }
         composable("signUpCredentials"){
             SignupCredentials(navController = navController)
