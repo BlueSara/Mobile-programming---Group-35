@@ -1,0 +1,286 @@
+package services
+
+import (
+	"studygroup_api/database"
+	"studygroup_api/models"
+
+	"cloud.google.com/go/firestore"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+// GetAllDocs retrieves all documents from a Firestore collection.
+// Returns a slice of maps containing the data from each document.
+func GetAllDocs(collection string) ([]map[string]interface{}, error) {
+
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return nil, dbErr
+	}
+	iter := db.Client.Collection(collection).Documents(db.Ctx)
+	var registrations []map[string]interface{}
+
+	for {
+		doc, err := iter.Next()
+		if err != nil {
+			break // Stop iterating if no more documents
+		}
+
+		registrations = append(registrations, doc.Data()) // Add the document data to the result slice
+	}
+	// Returning all the documents that have been added to registrations.
+	return registrations, nil
+}
+
+// getting all groups relative to the user
+func GetGroups(userID string) ([]models.Group, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return []models.Group{}, dbErr
+	}
+
+	//finding groups where current user is a participant
+	iter := db.Client.Collection("groups").Where("participants", "array-contains", userID).Documents(db.Ctx)
+	defer iter.Stop()
+
+	var groups []models.Group
+
+	for {
+		document, documentErr := iter.Next()
+
+		if documentErr != nil {
+			if documentErr == iterator.Done {
+				break
+			}
+			return []models.Group{}, documentErr
+		}
+
+		var group models.Group
+		if docErr := document.DataTo(&group); docErr != nil {
+			return groups, docErr
+		}
+
+		group.GroupID = document.Ref.ID
+		groups = append(groups, group)
+	}
+
+	return groups, nil
+}
+
+func InsertMessage(message models.Message) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	_, _, docRefErr := db.Client.Collection("messages").Add(db.Ctx, message)
+	return docRefErr
+}
+
+func GetGroupMessages(groupID string) ([]models.Message, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return []models.Message{}, dbErr
+	}
+
+	iter := db.Client.Collection("messages").Where("groupID", "==", groupID).Documents(db.Ctx)
+	defer iter.Stop()
+
+	var messages []models.Message
+
+	for {
+		document, documentErr := iter.Next()
+
+		if documentErr != nil {
+			if documentErr == iterator.Done {
+				break
+			}
+			return []models.Message{}, documentErr
+		}
+
+		var message models.Message
+		message.MessageID = document.Ref.ID
+		if docErr := document.DataTo(&message); docErr != nil {
+			return messages, docErr
+		}
+
+		messages = append(messages, message)
+	}
+
+	return messages, nil
+}
+
+func GetGroupByID(groupID string) (models.Group, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return models.Group{}, dbErr
+	}
+
+	groupRef := db.Client.Collection("groups").Doc(groupID)
+	userSnap, userErr := groupRef.Get(db.Ctx)
+	if userErr != nil {
+		return models.Group{}, userErr
+	}
+
+	var group models.Group
+	if userSnapErr := userSnap.DataTo(&group); userSnapErr != nil {
+		return models.Group{}, userSnapErr
+	}
+
+	group.GroupID = groupRef.ID
+	return group, nil
+}
+
+func GetGroupByPostID(postID string) (models.Group, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return models.Group{}, dbErr
+	}
+
+	iter := db.Client.Collection("groups").Where("postID", "==", postID).Limit(1).Documents(db.Ctx)
+	defer iter.Stop()
+
+	document, documentErr := iter.Next()
+	if documentErr != nil {
+		if status.Code(documentErr) == codes.NotFound {
+			return models.Group{}, nil
+		}
+		if documentErr == iterator.Done {
+			return models.Group{}, nil
+		}
+		return models.Group{}, documentErr
+	}
+
+	var group models.Group
+	if userErr := document.DataTo(&group); userErr != nil {
+		return models.Group{}, userErr
+	}
+
+	group.GroupID = document.Ref.ID
+
+	return group, nil
+}
+
+func CheckIfAnyAssistingUsers(responses []models.UserResponse) bool {
+	for _, r := range responses {
+		if r.Response == "assist" {
+			return true
+		}
+	}
+	return false
+}
+
+func CreateGroup(post models.Post, dittoUsers, assistUsers, participants []string) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	group := models.Group{
+		PostID:         post.PostID,
+		Participants:   participants,
+		AssistingUsers: assistUsers,
+		DittoUsers:     dittoUsers,
+		Messages:       []string{},
+	}
+
+	docRef, _, docRefErr := db.Client.Collection("groups").Add(db.Ctx, group)
+	if docRefErr != nil {
+		return docRefErr
+	}
+
+	_, docErr := docRef.Get(db.Ctx)
+
+	return docErr
+}
+
+func GetMessageByID(messageID string) (models.Message, error) {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return models.Message{}, dbErr
+	}
+
+	messageRef := db.Client.Collection("messages").Doc(messageID)
+	userSnap, userErr := messageRef.Get(db.Ctx)
+
+	if userErr != nil {
+		return models.Message{}, userErr
+	}
+
+	var message models.Message
+	if userSnapErr := userSnap.DataTo(&message); userSnapErr != nil {
+		return models.Message{}, userSnapErr
+	}
+
+	message.GroupID = messageRef.ID
+	return message, nil
+}
+
+func UpdateMessageReply(messageID string, message models.Message) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	_, updateErr := db.Client.Collection("messages").Doc(messageID).Set(db.Ctx, message)
+	return updateErr
+}
+
+func AddNewGroupMember(groupID, userID, answer string) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	var responseType string
+	switch answer {
+	case "ditto":
+		responseType = "dittoUsers"
+	case "assist":
+		responseType = "assistingUsers"
+	}
+
+	_, insertUserTypeErr := db.Client.Collection("groups").Doc(groupID).Update(db.Ctx, []firestore.Update{
+		{Path: responseType, Value: firestore.ArrayUnion(userID)},
+	})
+
+	if insertUserTypeErr != nil {
+		return insertUserTypeErr
+	}
+
+	_, insertParticipant := db.Client.Collection("groups").Doc(groupID).Update(db.Ctx, []firestore.Update{
+		{Path: "participants", Value: firestore.ArrayUnion(userID)},
+	})
+
+	return insertParticipant
+}
+
+func UpdateGroupMembers(groupID string, dittoUsers, assistUsers, participants []string) error {
+	db, dbErr := database.DB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	groupRef := db.Client.Collection("groups").Doc(groupID)
+
+	if _, updateAssistErr := groupRef.Update(db.Ctx, []firestore.Update{
+		{Path: "assistingUsers", Value: assistUsers},
+	}); updateAssistErr != nil {
+		return updateAssistErr
+	}
+
+	if _, updateDittoErr := groupRef.Update(db.Ctx, []firestore.Update{
+		{Path: "dittoUsers", Value: dittoUsers},
+	}); updateDittoErr != nil {
+		return updateDittoErr
+	}
+
+	if _, updateParticipantErr := groupRef.Update(db.Ctx, []firestore.Update{
+		{Path: "participants", Value: participants},
+	}); updateParticipantErr != nil {
+		return updateParticipantErr
+	}
+
+	return nil
+}

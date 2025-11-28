@@ -1,0 +1,1 @@
+This folder will be occupied with a custom function for simplifying the process of returning a response status code + data to return to user.
