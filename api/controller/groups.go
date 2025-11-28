@@ -11,6 +11,7 @@ import (
 	"studygroup_api/response"
 	"studygroup_api/services"
 	"studygroup_api/structs"
+	"studygroup_api/utils"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -155,25 +156,48 @@ func AnswerMeetupSuggestion(r *http.Request, w http.ResponseWriter, token *struc
 // row 17 in docs
 func GetSingleGroupData(r *http.Request, w http.ResponseWriter, token *structs.Token, groupID string) {
 
-	docs, errGetDocs := services.GetAllDocs("messages")
-	if errGetDocs != nil {
+	messages, messageErr := services.GetGroupMessages(groupID)
+	if messageErr != nil {
 		response.Error(http.StatusInternalServerError, "Internal server error", w)
 		return
 	}
 
-	// gets all documents that contains groupID
-	var output []map[string]interface{}
-	for _, doc := range docs {
-		if doc["groupID"] == groupID {
-			output = append(output, doc)
-		}
-	}
-
-	// return no content on empty list
-	if len(output) == 0 {
-		response.Empty(w)
+	group, groupErr := services.GetGroupByID(groupID)
+	if groupErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
 		return
 	}
 
-	response.Object(http.StatusOK, output, w)
+	post, postErr := services.GetPostByID(group.PostID)
+	if postErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
+	}
+
+	// return no content on empty list
+	if len(messages) == 0 {
+		response.Object(http.StatusOK, []models.Message{}, w)
+		return
+	}
+
+	var out []map[string]any
+	for _, m := range messages {
+		userAgreed, ownerAgreed, assistAgreed := utils.FindDecliningUsers(group, m, post, token.UserID)
+		isSelected := utils.MeetingIsSelected(ownerAgreed, assistAgreed, group, m)
+		out = append(out, jwt.MapClaims{
+			"messageID":    m.MessageID,
+			"groupID":      m.GroupID,
+			"time":         m.Time,
+			"location":     m.Location,
+			"building":     m.Building,
+			"room":         m.Room,
+			"comment":      m.Comment,
+			"userAgreed":   userAgreed,
+			"ownerAgreed":  ownerAgreed,
+			"assistAgreed": assistAgreed,
+			"isSelected":   isSelected,
+		})
+	}
+
+	response.Object(http.StatusOK, out, w)
 }
