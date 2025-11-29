@@ -41,6 +41,10 @@ android {
 
 dependencies {
 
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.navigation:navigation-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -51,6 +55,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation("androidx.navigation:navigation-compose:2.9.5")
     implementation("androidx.compose.foundation:foundation:1.9.4")
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
