@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 import components.PageHeadline
 import components.cards.CardSmall
@@ -16,8 +17,7 @@ import components.icons.ArrowLeft
 import components.icons.ArrowRight
 import components.icons.EditIcon
 import layout.Layout
-
-
+import utils.ConnectivityStatus
 
 
 @Composable
@@ -87,6 +87,7 @@ fun AllMeetups(
         arrowBack = true,
         pageDetails = { PageHeadline("Schedules overview") },
         content = {
+            ConnectivityStatus()
             Column(
                 verticalArrangement = Arrangement.spacedBy(space.m),
             ) {
