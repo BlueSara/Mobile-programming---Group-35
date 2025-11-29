@@ -15,7 +15,9 @@ func main() {
 		router usage example:
 		routes.Register("/test/:testID/path", "GET", handler.SomeHandler)
 	*/
-	godotenv.Load()
+	if os.Getenv("RENDER") == "" {
+		godotenv.Load()
+	}
 
 	routes.Register("/auth/signup", "POST", handler.Signup)
 	routes.Register("/auth/signin", "POST", handler.Signin)
