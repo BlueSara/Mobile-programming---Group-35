@@ -24,6 +24,7 @@ import components.cards.CardContainer
 import components.cards.CardLarge
 import components.cards.CardMessage
 import components.cards.CardSmall
+import database.TestFirestoreScreen
 import layout.Layout
 import java.time.LocalDate
 
@@ -33,7 +34,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StudyGroupTheme {
-                navigation.AppNavHost()
+                TestFirestoreScreen()
+            //navigation.AppNavHost()
             }
         }
     }
