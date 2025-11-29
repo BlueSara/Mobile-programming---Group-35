@@ -19,7 +19,7 @@ func main() {
 
 	if envErr := godotenv.Load(); envErr != nil {
 		log.Fatalf("Failed to load environment")
-		return
+		//return
 	}
 
 	routes.Register("/auth/signup", "POST", handler.Signup)
