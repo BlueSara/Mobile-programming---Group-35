@@ -6,6 +6,8 @@ import (
 	"os"
 	"studygroup_api/handler"
 	"studygroup_api/routes"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -13,11 +15,11 @@ func main() {
 		router usage example:
 		routes.Register("/test/:testID/path", "GET", handler.SomeHandler)
 	*/
-	/*
-		if envErr := godotenv.Load(); envErr != nil {
-			log.Fatalf("Failed to load environment")
-			return
-		}*/
+
+	if envErr := godotenv.Load(); envErr != nil {
+		fmt.Printf("Failed to load environment")
+
+	}
 
 	routes.Register("/auth/signup", "POST", handler.Signup)
 	routes.Register("/auth/signin", "POST", handler.Signin)
@@ -40,7 +42,7 @@ func main() {
 
 	fmt.Println("Server running on port", port)
 
-	http.ListenAndServe("0.0.0.0:"+port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.ListenAndServe(port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		routes.Router(r.URL.Path, r.Method, r, w)
 	}))
 }
