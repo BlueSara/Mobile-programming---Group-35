@@ -14,10 +14,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
+import domain.removeToken
+
 /**
  * The layout component that holds the top-bar, screen content and footer.
  * It handles the main-layout responsibilities, for a consistent visual presentation.
@@ -45,10 +48,12 @@ fun Layout(
         }
     }
 
+    val context = LocalContext.current
+
     /**For signing out user. removes stored token used with api */
     fun handleSignOut(){
-        //TODO : ADD LOGIC TO SIGN OUT USER, E.G. REMOVE TOKEN FROM STORAGE
-        navigate("signUpCredentials")
+        removeToken(context)
+        navigate("signIn")
     }
 
     val colors = LocalCustomColors.current

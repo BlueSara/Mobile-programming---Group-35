@@ -1,10 +1,23 @@
 
 package navigation
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import domain.getToken
 import screens.AllMeetups
 import screens.CreateMeetup
 import screens.CreatePost
@@ -18,29 +31,65 @@ import screens.UserAccount
 import screens.UserReplies
 import screens.UserPosts
 
+
+/**For handling protected screens
+ * @param route - String, no default: The route to the screen to display
+ * @param isSignedIn - Boolean, no default. State for if user is signed in or not.
+ * @param navController - NavHostController, no default. For auto-navigating user to sign-in screen
+ * if not signed in and attempting to view screen requiring sign-in
+ * @param content - Composable, no default. The composable screen to display when user is signed in
+ * */
+fun NavGraphBuilder.signedInScreen(
+    route: String,
+    isSignedIn: Boolean,
+    navController: NavHostController,
+    content : @Composable () -> Unit,
+){
+    composable(route) {
+        if (isSignedIn){
+            content()
+        } else{
+            LaunchedEffect(Unit) {
+                navController.navigate("signIn"){
+                    popUpTo(route) {inclusive = true}
+                }
+            }
+        }
+    }
+}
+/**The navigation host for the application.
+ * */
 @Composable
 fun AppNavHost(){
     val navController = rememberNavController()
+    val context = LocalContext.current
 
-    NavHost(navController = navController, startDestination = "home"){
-        composable("allMeetups"){
-            AllMeetups(navController = navController)
+    //The api_token for tracking if user is signed in or not
+    var token by remember { mutableStateOf(getToken(context)) }
+
+    //boolean handling state for if user is signed in or not
+    var mIsSignedIn by remember { mutableStateOf(token != null) }
+
+    // start destination for which screen user initially should view
+    var startDestination by remember { mutableStateOf(if (mIsSignedIn) "home" else "signIn") }
+
+    //checking changes to the token stored in preferences.
+    // If token is updated, meaning the user has signed in/out, the
+    // allowed screens and start-destination is updated to correspond with signed-in status
+    DisposableEffect(context) {
+        val preferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener{_, key ->
+            if(key == "api_token") {
+                token = preferences.getString("api_token", null)
+                mIsSignedIn = token != null
+                if (mIsSignedIn) startDestination = "home"
+            }
         }
-        composable("createMeetup"){
-            CreateMeetup(navController = navController)
-        }
-        composable("createPost"){
-            CreatePost(navController = navController)
-        }
-        composable("editPost"){
-            EditPost(navController = navController)
-        }
-        composable("home"){
-            Home(navController = navController)
-        }
-        composable("meetup"){
-            Meetup(navController = navController)
-        }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+        onDispose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+
+    NavHost(navController = navController, startDestination = startDestination){
         composable("signIn"){
             SignIn(navController = navController)
         }
@@ -50,14 +99,25 @@ fun AppNavHost(){
         composable("signUpUniversity"){
             SignupUniversity(navController = navController)
         }
-        composable("userAccount"){
-            UserAccount(navController = navController)
-        }
-        composable("userPost"){
-            UserPosts(navController = navController)
-        }
-        composable("userReplies"){
-            UserReplies(navController = navController)
-        }
+
+        //protected screens that user has to be signed in to view
+        signedInScreen(
+            "home",mIsSignedIn,navController){Home(navController = navController)}
+        signedInScreen(
+            "allMeetups",mIsSignedIn,navController){ AllMeetups(navController = navController)}
+        signedInScreen(
+            "createMeetup",mIsSignedIn,navController){ CreateMeetup(navController = navController)}
+        signedInScreen(
+            "createPost",mIsSignedIn,navController){ CreatePost(navController = navController)}
+        signedInScreen(
+            "editPost",mIsSignedIn,navController){ EditPost(navController = navController)}
+        signedInScreen(
+            "meetup",mIsSignedIn,navController){ Meetup(navController = navController)}
+        signedInScreen(
+            "userAccount",mIsSignedIn,navController){ UserAccount(navController = navController)}
+        signedInScreen(
+            "userPost",mIsSignedIn,navController){ UserPosts(navController = navController)}
+        signedInScreen(
+            "userReplies",mIsSignedIn,navController){ UserReplies(navController = navController)}
     }
 }
