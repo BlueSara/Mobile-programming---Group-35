@@ -15,11 +15,7 @@ func main() {
 		router usage example:
 		routes.Register("/test/:testID/path", "GET", handler.SomeHandler)
 	*/
-
-	if envErr := godotenv.Load(); envErr != nil {
-		fmt.Printf("Failed to load environment")
-
-	}
+	godotenv.Load()
 
 	routes.Register("/auth/signup", "POST", handler.Signup)
 	routes.Register("/auth/signin", "POST", handler.Signin)
