@@ -118,7 +118,7 @@ fun handleApiReqPost(path: String, body: Map<String, Any> ?= emptyMap(), context
 
     //checks if it is an auth route or not. Auth-routes should not include a auth-token
     val isSignInRoute = path == "/auth/signin"
-    val token = if (isSignInRoute) getToken(context) else null
+    val token = if (!isSignInRoute) getToken(context) else null
 
     formatRequest(connection, "POST", token)
     connection.doOutput = true
