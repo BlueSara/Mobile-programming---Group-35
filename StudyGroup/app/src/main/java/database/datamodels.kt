@@ -4,14 +4,14 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.PropertyName
 
 
-// ------------------- UNIVERSITY -------------------
+// UNIVERSITY
 data class University(
     val abbr: String? = null,
     val name: String? = null,
     val studyprogram: List<DocumentReference>? = null
 )
 
-// ------------------- STUDY PROGRAM -------------------
+// STUDY PROGRAM
 data class StudyProgram(
     val abbr: String? = null,
     val name: String? = null,
@@ -23,7 +23,7 @@ data class StudyProgram(
 )
 
 
-// ------------------- SUBJECT -------------------
+// SUBJECT
 data class Subject(
     val code: String? = null,
     val name: String? = null,
@@ -40,7 +40,7 @@ data class Subject(
 
 
 
-// Inner class: one element inside "studyPrograms" array
+// Inner class: elements inside "studyPrograms" array in subjects
 data class StudyProgramLink(
     val obligatory: Boolean? = null,
 

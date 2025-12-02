@@ -9,6 +9,10 @@ import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+
+
+
+// This is just a test for the firebasehandler
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TestFirestoreScreen() {
@@ -28,18 +32,18 @@ fun TestFirestoreScreen() {
 
         scope.launch {
             try {
-                // 1️⃣ Get all universities
+                // Get all universities
                 universities = service.getAllUniversities()
 
-                val uni = universities.firstOrNull()
+                val uni = universities.firstOrNull { it.studyprogram?.isNotEmpty() == true }
                 val studyProgRefs = uni?.studyprogram ?: emptyList()
 
-                // 2️⃣ Fetch study programs from DocumentReferences
+                // Fetch study programs from DocumentReferences
                 studyPrograms = studyProgRefs.mapNotNull { ref ->
                     ref.get().await().toObject<StudyProgram>()
                 }
 
-                // 3️⃣ Fetch subjects for the FIRST study program
+                // Fetch subjects for the FIRST study program
                 val firstProgRef = studyProgRefs.firstOrNull()
                 if (firstProgRef != null) {
                     subjects = service.getSubjectsForStudyProgram(firstProgRef.id)
@@ -68,9 +72,9 @@ fun TestFirestoreScreen() {
         if (loading) Text("Loading…")
         error?.let { Text("Error: $it", color = MaterialTheme.colorScheme.error) }
 
-        // --------------------------
-        // 1️⃣ Display Universities
-        // --------------------------
+
+        // Display Universities
+
         Text("Universities (${universities.size})")
         universities.forEach {
             Text(" - ${it.abbr} : ${it.name}")
@@ -78,9 +82,9 @@ fun TestFirestoreScreen() {
 
         Spacer(Modifier.height(20.dp))
 
-        // --------------------------
-        // 2️⃣ Study Programs
-        // --------------------------
+
+        // Study Programs
+
         Text("Study Programs (${studyPrograms.size})")
         studyPrograms.forEach {
             Text(" - ${it.abbr} : ${it.name}")
@@ -88,9 +92,8 @@ fun TestFirestoreScreen() {
 
         Spacer(Modifier.height(20.dp))
 
-        // --------------------------
-        // 3️⃣ Subjects
-        // --------------------------
+        // Subjects
+
         Text("Subjects (${subjects.size})")
         subjects.forEach {
             Text(" - ${it.code} : ${it.name}")
