@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             StudyGroupTheme {
                 TestFirestoreScreen()
-            //navigation.AppNavHost()
+            //snavigation.AppNavHost()
             }
         }
     }

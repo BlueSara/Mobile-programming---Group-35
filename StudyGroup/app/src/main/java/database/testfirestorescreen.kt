@@ -10,18 +10,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 
-
-
-// This is just a test for the firebasehandler
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TestFirestoreScreen() {
     val service = remember { UniversityService() }
     val scope = rememberCoroutineScope()
 
-    var universities by remember { mutableStateOf<List<University>>(emptyList()) }
-    var studyPrograms by remember { mutableStateOf<List<StudyProgram>>(emptyList()) }
-    var subjects by remember { mutableStateOf<List<Subject>>(emptyList()) }
+    var universities by remember { mutableStateOf(emptyList<University>()) }
+    var studyPrograms by remember { mutableStateOf(emptyList<StudyProgram>()) }
+    var subjects by remember { mutableStateOf(emptyList<Subject>()) }
 
     var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -32,22 +29,9 @@ fun TestFirestoreScreen() {
 
         scope.launch {
             try {
-                // Get all universities
                 universities = service.getAllUniversities()
-
-                val uni = universities.firstOrNull { it.studyprogram?.isNotEmpty() == true }
-                val studyProgRefs = uni?.studyprogram ?: emptyList()
-
-                // Fetch study programs from DocumentReferences
-                studyPrograms = studyProgRefs.mapNotNull { ref ->
-                    ref.get().await().toObject<StudyProgram>()
-                }
-
-                // Fetch subjects for the FIRST study program
-                val firstProgRef = studyProgRefs.firstOrNull()
-                if (firstProgRef != null) {
-                    subjects = service.getSubjectsForStudyProgram(firstProgRef.id)
-                }
+                studyPrograms = service.getAllStudyPrograms()
+                subjects = service.getAllSubjects()
 
             } catch (e: Exception) {
                 error = e.message
@@ -58,11 +42,12 @@ fun TestFirestoreScreen() {
         }
     }
 
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         loadData()
     }
 
     Column(Modifier.padding(16.dp)) {
+
         Button(onClick = { loadData() }) {
             Text("REFRESH TESTS")
         }
@@ -72,9 +57,6 @@ fun TestFirestoreScreen() {
         if (loading) Text("Loading…")
         error?.let { Text("Error: $it", color = MaterialTheme.colorScheme.error) }
 
-
-        // Display Universities
-
         Text("Universities (${universities.size})")
         universities.forEach {
             Text(" - ${it.abbr} : ${it.name}")
@@ -82,17 +64,12 @@ fun TestFirestoreScreen() {
 
         Spacer(Modifier.height(20.dp))
 
-
-        // Study Programs
-
         Text("Study Programs (${studyPrograms.size})")
         studyPrograms.forEach {
             Text(" - ${it.abbr} : ${it.name}")
         }
 
         Spacer(Modifier.height(20.dp))
-
-        // Subjects
 
         Text("Subjects (${subjects.size})")
         subjects.forEach {
