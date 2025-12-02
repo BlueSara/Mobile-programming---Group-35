@@ -267,6 +267,9 @@ func GetAllPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 				shouldAppend = false
 			}
 		}
+		if p.ExpirationDate.Before(time.Now()) {
+			shouldAppend = false
+		}
 
 		if shouldAppend {
 			posts = append(posts, p)
