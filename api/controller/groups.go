@@ -42,11 +42,12 @@ func GetGroups(r *http.Request, w http.ResponseWriter, token *structs.Token) {
 	for i, post := range posts {
 		group := groups[i]
 		out = append(out, jwt.MapClaims{
-			"postID":  group.PostID,
-			"groupID": group.GroupID,
-			"topic":   post.Topic,
-			"subject": post.Subject,
-			"title":   post.Title,
+			"subjectCode": post.SubjectCode,
+			"postID":      group.PostID,
+			"groupID":     group.GroupID,
+			"topic":       post.Topic,
+			"subject":     post.Subject,
+			"title":       post.Title,
 		})
 	}
 
@@ -180,11 +181,11 @@ func GetSingleGroupData(r *http.Request, w http.ResponseWriter, token *structs.T
 		return
 	}
 
-	var out []map[string]any
+	var outMessages []map[string]any
 	for _, m := range messages {
 		userAgreed, ownerAgreed, assistAgreed := utils.FindDecliningUsers(group, m, post, token.UserID)
 		isSelected := utils.MeetingIsSelected(ownerAgreed, assistAgreed, group, m)
-		out = append(out, jwt.MapClaims{
+		outMessages = append(outMessages, jwt.MapClaims{
 			"messageID":    m.MessageID,
 			"groupID":      m.GroupID,
 			"time":         m.Time,
@@ -197,6 +198,11 @@ func GetSingleGroupData(r *http.Request, w http.ResponseWriter, token *structs.T
 			"assistAgreed": assistAgreed,
 			"isSelected":   isSelected,
 		})
+	}
+
+	out := jwt.MapClaims{
+		"messages":  outMessages,
+		"groupInfo": group,
 	}
 
 	response.Object(http.StatusOK, out, w)

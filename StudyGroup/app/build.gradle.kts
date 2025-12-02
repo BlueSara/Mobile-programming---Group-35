@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -41,6 +43,10 @@ android {
 
 dependencies {
 
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.navigation:navigation-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -51,6 +57,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation("androidx.navigation:navigation-compose:2.9.5")
     implementation("androidx.compose.foundation:foundation:1.9.4")
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,4 +65,22 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // Import the Firebase BoM
+
+    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+
+
+    // TODO: Add the dependencies for Firebase products you want to use
+
+    // When using the BoM, don't specify versions in Firebase dependencies
+
+    // https://firebase.google.com/docs/android/setup#available-libraries
+
+    implementation("com.google.firebase:firebase-firestore")
+    // Firestore
+    // Add the dependency for the Firebase SDK for Google Analytics
+    implementation("com.google.firebase:firebase-analytics")
+    // coroutine support for Firestore .await()
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
 }
