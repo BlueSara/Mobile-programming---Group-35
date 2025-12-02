@@ -1,5 +1,13 @@
 package screens
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,17 +18,23 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.example.studygroup.ui.theme.LocalSpacing
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import components.AppButton
 import components.ButtonType
 import components.DateInput
@@ -50,21 +64,73 @@ val mockUpSubjects:List<Map<String,String>> =  listOf(
 )
 
 @Composable
-@Preview(showBackground = true)
 fun CreatePost(
     navController: NavHostController ?=null,) {
     val availableSubjects = mockUpSubjects // TODO: USE REAL DATA
     var mSelectedSubject by remember { mutableStateOf("") }
     var mTopic by remember { mutableStateOf("") }
     var mExpirationDate by remember { mutableStateOf(LocalDate.now()) }
-    var mUseLocation by remember { mutableStateOf(true) }
+    var mUseLocation by remember { mutableStateOf(false) }
 
     val space = LocalSpacing.current
+    val permission = Manifest.permission.ACCESS_FINE_LOCATION
 
     fun handlePushingPost(){
         //TODO : ADD LOGIC TO VALIDATE AND PUBLISH POST (API)
     }
 
+    var mLat by remember { mutableDoubleStateOf(0.0) }
+    var mLng by remember { mutableDoubleStateOf(0.0) }
+
+    val context = LocalContext.current
+    val activity = context as? ComponentActivity
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            activity?.let { act ->
+                val client = LocationServices.getFusedLocationProviderClient(act)
+                @SuppressLint("MissingPermission")
+                client.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    null
+                ).addOnSuccessListener { loc ->
+                    if (loc != null) {
+                        mLat = loc.latitude
+                        mLng = loc.longitude
+                        mUseLocation = true
+                    } else {
+                        Log.w("Location", "Location unavailable")
+                    }
+                }
+            }
+        } else {
+            mUseLocation = false
+            Log.w("Location", "Permission denied")
+        }
+    }
+
+    if (ContextCompat.checkSelfPermission(context, permission)
+        == PackageManager.PERMISSION_GRANTED
+    ) {
+        activity?.let { act ->
+            val client =
+                LocationServices.getFusedLocationProviderClient(act)
+            @SuppressLint("MissingPermission")
+            client.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                null
+            ).addOnSuccessListener { loc ->
+                if (loc != null) {
+                    mLat = loc.latitude
+                    mLng = loc.longitude
+                    mUseLocation = true
+                    Log.i("CHECKBOX", ".addOnSuccessListener")
+                }
+            }
+        }
+    }
 
     Layout(
         navController= navController,
@@ -108,7 +174,37 @@ fun CreatePost(
                             .width(space.m)
                             .height(space.m),
                         checked = mUseLocation,
-                        onCheckedChange = { mUseLocation = !mUseLocation },
+                        onCheckedChange = {
+                            if (!mUseLocation) {
+                                if (ContextCompat.checkSelfPermission(context, permission)
+                                    == PackageManager.PERMISSION_GRANTED
+                                ) {
+
+                                    // Already granted, just fetch location
+                                    activity?.let { act ->
+                                        val client =
+                                            LocationServices.getFusedLocationProviderClient(act)
+                                        @SuppressLint("MissingPermission")
+                                        client.getCurrentLocation(
+                                            Priority.PRIORITY_HIGH_ACCURACY,
+                                            null
+                                        ).addOnSuccessListener { loc ->
+                                            if (loc != null) {
+                                                mLat = loc.latitude
+                                                mLng = loc.longitude
+                                                mUseLocation = true
+                                                Log.i("CHECKBOX", ".assOnSuccessListener")
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    // Trigger permission prompt manually
+                                    permissionLauncher.launch(permission)
+                                }
+                            } else {
+                                mUseLocation = false
+                            }
+                        },
                     )
 
                     Text(text = "Visible only to those close to your location",fontSize = 18.sp)

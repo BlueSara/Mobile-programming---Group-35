@@ -1,11 +1,18 @@
 package screens
 
+import android.content.Context.SENSOR_SERVICE
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.rotationMatrix
 import androidx.navigation.NavHostController
 import com.example.studygroup.ui.theme.LocalSpacing
 import components.AppButton
@@ -106,6 +114,50 @@ fun Home(
 
         //insert logic for calling api to answer post here
     }
+
+
+    val context = LocalContext.current
+    val sensorManager = remember {
+        context.getSystemService(SENSOR_SERVICE) as SensorManager
+    }
+
+    var lastState by remember { mutableStateOf("none") }
+
+    DisposableEffect(Unit) {
+        val listener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+
+                if (event.sensor.type == Sensor.TYPE_GYROSCOPE) {
+
+                    val rotation = event.values[2]
+
+                    val newState = when {
+                        rotation > 3 -> "right"
+                        rotation < -3 -> "left"
+                        else -> "none"
+                    }
+
+                    if (newState != lastState) {
+                        when (newState) {
+                            "right" -> handleReply("skip")
+                            "left" -> handleReply("assist")
+                        }
+                    }
+
+                    lastState = newState
+                }
+            }
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+
+        val rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+        sensorManager.registerListener(listener, rotationSensor, SensorManager.SENSOR_DELAY_GAME)
+
+        onDispose {
+            sensorManager.unregisterListener(listener)
+        }
+    }
+
 
     //fetching posts when screen is initially loaded
     fetchPosts()
