@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +30,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import layout.Layout
+import org.json.JSONObject
+import toMap
+import kotlin.reflect.typeOf
 
 /**The screen for viewing a single groups meetup "chat"
  * @param navController - NavHostController, default: null. The navHost controller used to navigate to different screens.
@@ -41,7 +45,7 @@ fun Meetup(
     ){
 
     var mMessages = remember { mutableStateListOf<Map<String, Any>>() }
-    var mGroup = remember { mutableMapOf<String, Any>() }
+    var mGroup = remember { mutableStateMapOf<String, Any>() }
     val space = LocalSpacing.current
 
     val context = LocalContext.current
@@ -50,18 +54,16 @@ fun Meetup(
         CoroutineScope(Dispatchers.IO).launch{
             val messageResponse = handleApiReqGet("/groups/$groupID", context)
             if (!messageResponse.ok) return@launch
-            mMessages.addAll(elements = messageResponse.content as List<Map<String,Any>>)
+            val content= messageResponse.content as? Map<*, *> ?: emptyMap<String, Any?>()
+            val group = content["groupInfo"] as? Map<String, Any>?: emptyMap()
+            val messages = content["messages"] as? List<Map<String, Any>>?: listOf(emptyMap())
 
-            val groupsResponse = handleApiReqGet("/post/groups", context)
-            if (!groupsResponse.ok) return@launch
-
-            val groups = groupsResponse.content as List<Map<String, Any?>>
-            val group = groups.find { it -> it["groupID"] == groupID }
-            mGroup.putAll(group as MutableMap<String, Any>)
+            mMessages.addAll(messages)
+            mGroup.putAll(group)
         }
     }
 
-    handleFetchData()
+
 
     fun handleUpdateResponse(id : String) {
         val success = true
@@ -79,15 +81,18 @@ fun Meetup(
         mMessages[i] = message
     }
 
-    Layout(
+    handleFetchData()
+
+     Layout(
         navController = navController,
         arrowBack = true,
         showFilter = true,
         pageDetails = {
             MeetupHeader(
-                participants = (mGroup["participants"] as? List<*>)?.size?: 0,
-                helpers = (mGroup["assistingUsers"] as? List<*>)?.size?: 0
-            )},
+                participants = (mGroup["Participants"] as? List<*>)?.size ?: 0,
+                helpers = (mGroup["AssistingUsers"] as? List<*>)?.size ?: 0
+                )
+                  },
         footer = {
             Row( modifier = Modifier.fillMaxWidth())
             {
@@ -106,7 +111,6 @@ fun Meetup(
                     .padding(horizontal = space.s),
                 verticalArrangement = Arrangement.spacedBy(space.m),
             ) {
-
                 // TODO: Have to use real data
                 mMessages.forEach { post ->
                     CardMessage(
@@ -150,7 +154,6 @@ fun MeetupHeader(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-
         ) {
     }
         Column(verticalArrangement = Arrangement.spacedBy(space.xs)) {
