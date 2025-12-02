@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 	"studygroup_api/handler"
 	"studygroup_api/routes"
 
@@ -15,10 +15,8 @@ func main() {
 		router usage example:
 		routes.Register("/test/:testID/path", "GET", handler.SomeHandler)
 	*/
-
-	if envErr := godotenv.Load(); envErr != nil {
-		log.Fatalf("Failed to load environment")
-		return
+	if os.Getenv("RENDER") == "" {
+		godotenv.Load()
 	}
 
 	routes.Register("/auth/signup", "POST", handler.Signup)
@@ -35,7 +33,10 @@ func main() {
 	routes.Register("/groups/:groupID", "GET", handler.GetSingleGroupData) // row 17
 	routes.Register("/posts/replied", "GET", handler.GetRepliedPosts)      // row 14
 
-	port := ":3000"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
 
 	fmt.Println("Server running on port", port)
 
