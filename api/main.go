@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"studygroup_api/handler"
@@ -16,10 +15,8 @@ func main() {
 		router usage example:
 		routes.Register("/test/:testID/path", "GET", handler.SomeHandler)
 	*/
-
-	if envErr := godotenv.Load(); envErr != nil {
-		log.Fatalf("Failed to load environment")
-		return
+	if os.Getenv("RENDER") == "" {
+		godotenv.Load()
 	}
 
 	routes.Register("/auth/signup", "POST", handler.Signup)
