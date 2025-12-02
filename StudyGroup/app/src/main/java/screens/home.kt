@@ -116,7 +116,6 @@ fun Home(
     }
 
 
-    val context = LocalContext.current
     val sensorManager = remember {
         context.getSystemService(SENSOR_SERVICE) as SensorManager
     }
