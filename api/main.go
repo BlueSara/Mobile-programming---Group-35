@@ -40,7 +40,7 @@ func main() {
 
 	fmt.Println("Server running on port", port)
 
-	http.ListenAndServe(port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.ListenAndServe("0.0.0.0:"+port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		routes.Router(r.URL.Path, r.Method, r, w)
 	}))
 }
