@@ -12,11 +12,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import domain.getToken
 import screens.AllMeetups
 import screens.CreateMeetup
@@ -43,11 +46,20 @@ fun NavGraphBuilder.signedInScreen(
     route: String,
     isSignedIn: Boolean,
     navController: NavHostController,
-    content : @Composable () -> Unit,
+    content : @Composable (NavBackStackEntry) -> Unit,
 ){
-    composable(route) {
+    val routeHasId = route.contains("{id}")
+    val args = when (routeHasId){
+        true -> listOf(navArgument("id") {type = NavType.StringType})
+        else -> emptyList()
+
+    }
+
+    composable(route,
+        arguments = args
+        ) { backStackEntry ->
         if (isSignedIn){
-            content()
+            content(backStackEntry)
         } else{
             LaunchedEffect(Unit) {
                 navController.navigate("signIn"){
@@ -112,7 +124,11 @@ fun AppNavHost(){
         signedInScreen(
             "editPost",mIsSignedIn,navController){ EditPost(navController = navController)}
         signedInScreen(
-            "meetup",mIsSignedIn,navController){ Meetup(navController = navController)}
+            "meetup/{id}",mIsSignedIn,navController){
+            backStackEntry ->
+            val groupID = backStackEntry.arguments?.getString("id")
+            Meetup(navController = navController, groupID)
+        }
         signedInScreen(
             "userAccount",mIsSignedIn,navController){ UserAccount(navController = navController)}
         signedInScreen(
