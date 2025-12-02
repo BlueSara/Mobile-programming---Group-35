@@ -3,11 +3,8 @@ package screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,11 +14,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.studygroup.ui.theme.LocalCustomColors
@@ -29,6 +26,12 @@ import com.example.studygroup.ui.theme.LocalSpacing
 import components.AppButton
 import components.ButtonType
 import components.TextInput
+import domain.getToken
+import handleApiReqPost
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun SignIn(
@@ -36,6 +39,7 @@ fun SignIn(
 ){
     val space = LocalSpacing.current
     val colors = LocalCustomColors.current
+    val context = LocalContext.current
 
     var mEmail by remember { mutableStateOf("") }
     var mPassword by remember { mutableStateOf("") }
@@ -43,11 +47,19 @@ fun SignIn(
     fun handleSignIn(){
         if ((mEmail).isEmpty() || (mPassword).isEmpty()) return
 
-        // TODO : include proper logic for checking signin
-        val success = true
+        val credentials = mapOf(
+            "email" to mEmail,
+            "password" to mPassword
+        )
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = handleApiReqPost("/auth/signin", credentials, context)
+            if (!response.ok) return@launch
 
-        if (!success) return
-        navController?.navigate("home")
+            withContext(Dispatchers.Main){
+                navController?.navigate("home")
+            }
+
+        }
     }
 
     Column (
@@ -58,6 +70,7 @@ fun SignIn(
         verticalArrangement = Arrangement.SpaceBetween
     ){
         Column{
+
             Text(
                 text = "Welcome to Study Group!",
                 style = TextStyle(
@@ -66,7 +79,7 @@ fun SignIn(
                 ),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(top=space.xl)
+                    .padding(top = space.xl)
             )
             Text(
                 text = "Sign in",
@@ -98,7 +111,7 @@ fun SignIn(
                 modifier =  Modifier
                     .padding(top = space.s)
                     .clickable(
-                        onClick = {navController?.navigate("signUpCredentials")}
+                        onClick = { navController?.navigate("signUpCredentials") }
                     )
 
             )
