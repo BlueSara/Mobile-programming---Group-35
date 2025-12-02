@@ -34,8 +34,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StudyGroupTheme {
-                TestFirestoreScreen()
-            //snavigation.AppNavHost()
+                navigation.AppNavHost()
             }
         }
     }
