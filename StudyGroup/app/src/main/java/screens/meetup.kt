@@ -26,13 +26,11 @@ import components.AppButton
 import components.ButtonType
 import components.cards.CardMessage
 import handleApiReqGet
+import handleApiReqPatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import layout.Layout
-import org.json.JSONObject
-import toMap
-import kotlin.reflect.typeOf
 
 /**The screen for viewing a single groups meetup "chat"
  * @param navController - NavHostController, default: null. The navHost controller used to navigate to different screens.
@@ -44,41 +42,65 @@ fun Meetup(
     groupID: String? =null,
     ){
 
-    var mMessages = remember { mutableStateListOf<Map<String, Any>>() }
-    var mGroup = remember { mutableStateMapOf<String, Any>() }
+    val mMessages = remember { mutableStateListOf<Map<String, Any>>() }
+    val mGroup = remember { mutableStateMapOf<String, Any>() }
     val space = LocalSpacing.current
 
     val context = LocalContext.current
 
+    /**Fetches the data for this group - group info and messages to display
+     * */
     fun handleFetchData() {
         CoroutineScope(Dispatchers.IO).launch{
+            //call api handler function to get group info
             val messageResponse = handleApiReqGet("/groups/$groupID", context)
+            // Return if err
+            //TODO : implement functionality to show pop-up msg to user if any errs occurred
             if (!messageResponse.ok) return@launch
+
+            //parsing content from api response
             val content= messageResponse.content as? Map<*, *> ?: emptyMap<String, Any?>()
             val group = content["groupInfo"] as? Map<String, Any>?: emptyMap()
             val messages = content["messages"] as? List<Map<String, Any>>?: listOf(emptyMap())
 
-            mMessages.addAll(messages)
-            mGroup.putAll(group)
+            //only show messages if not empty, and not "empty" array
+            if (messages.isNotEmpty() && messages.toString() != "[{}]") mMessages.addAll(messages)
+            if (group.isNotEmpty()) mGroup.putAll(group)
         }
     }
-
-
-
+    /**Handles calling api-handler for updating reply, as well as updating ui when api req is ok.
+     * @param id - String, no default: The id of the message to update
+     * */
     fun handleUpdateResponse(id : String) {
-        val success = true
+        CoroutineScope(Dispatchers.IO).launch {
+            //finding the current message
+            val i = mMessages.indexOfFirst { it -> it["messageID"] == id }
+            if (i == -1) return@launch
+            val message = mMessages[i].toMutableMap()
 
-        val i = mMessages.indexOfFirst { it -> it["messageID"] == id }
-        if (i == -1 || !success) return
+            //gets current answer: If it currently is "true" then it should be updated to false
+            //if currently not true, e.g. false or null, then it is updated to true
+            val answer = mapOf(
+                "accept" to when(message["userAgreed"]){
+                    true -> false
+                    else -> true
+                }
+            )
+            //making the request to api via api handler function
+            val response = handleApiReqPatch("/groups/$groupID/messages/$id", context, answer)
+            val success = response.ok
 
-        val message = mMessages[i].toMutableMap()
+            //return if not success
+            if (!success) return@launch
 
-        message["userAgreed"] = when( message["userAgreed"]) {
-            true -> false
-            else -> true
+            //update message for ui
+            message["userAgreed"] = when( message["userAgreed"]) {
+                true -> false
+                else -> true
+            }
+            //update item in mutable map for ui to update
+            mMessages[i] = message
         }
-
-        mMessages[i] = message
     }
 
     handleFetchData()
@@ -101,24 +123,25 @@ fun Meetup(
                         .weight(1f),
                     type = ButtonType.PRIMARY,
                     text = "Make a suggestion",
-                    onClick =  {navController?.navigate("createMeetup")},
+                    onClick =  {navController?.navigate("createMeetup/$groupID")},
             )}},
         content = {
             // Scrollable main content
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = space.s),
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(space.m),
             ) {
-                // TODO: Have to use real data
-                mMessages.forEach { post ->
-                    CardMessage(
-                        details = post,
-                        onClick = {
-                            handleUpdateResponse(post["messageID"]?.toString()?: "")
-                        }
-                    )
+
+                if (mMessages.isNotEmpty()){
+                    mMessages.forEach { message ->
+                        CardMessage(
+                            details = message,
+                            onClick = {
+                                handleUpdateResponse(message["messageID"]?.toString()?: "")
+                            }
+                        )
+                    }
                 }
             }
         }
