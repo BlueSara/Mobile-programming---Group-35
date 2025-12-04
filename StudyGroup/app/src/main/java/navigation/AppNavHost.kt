@@ -21,15 +21,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import domain.getToken
-import screens.AllMeetups
+import screens.AllGroups
 import screens.CreateMeetup
 import screens.CreatePost
 import screens.EditPost
 import screens.Home
-import screens.Meetup
 import screens.SignIn
 import screens.SignupCredentials
 import screens.SignupUniversity
+import screens.SingleGroup
 import screens.UserAccount
 import screens.UserReplies
 import screens.UserPosts
@@ -116,9 +116,13 @@ fun AppNavHost(){
         signedInScreen(
             "home",mIsSignedIn,navController){Home(navController = navController)}
         signedInScreen(
-            "allMeetups",mIsSignedIn,navController){ AllMeetups(navController = navController)}
+            "allMeetups",mIsSignedIn,navController){ AllGroups(navController = navController) }
         signedInScreen(
-            "createMeetup",mIsSignedIn,navController){ CreateMeetup(navController = navController)}
+            "createMeetup/{id}",mIsSignedIn,navController){
+                backStackEntry ->
+            val groupID = backStackEntry.arguments?.getString("id")
+            CreateMeetup(navController = navController, groupID)
+        }
         signedInScreen(
             "createPost",mIsSignedIn,navController){ CreatePost(navController = navController)}
         signedInScreen(
@@ -127,7 +131,7 @@ fun AppNavHost(){
             "meetup/{id}",mIsSignedIn,navController){
             backStackEntry ->
             val groupID = backStackEntry.arguments?.getString("id")
-            Meetup(navController = navController, groupID)
+            SingleGroup(navController = navController, groupID)
         }
         signedInScreen(
             "userAccount",mIsSignedIn,navController){ UserAccount(navController = navController)}
