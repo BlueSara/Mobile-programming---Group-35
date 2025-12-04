@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import components.AppButton
 import components.ButtonType
 import components.cards.CardMessage
 import handleApiReqGet
+import handleApiReqPatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,59 +37,81 @@ import layout.Layout
  * @param groupID - String, default: null. The id of the current group to get data for
  * */
 @Composable
-fun Meetup(
+fun SingleGroup(
     navController: NavHostController ?=null,
     groupID: String? =null,
     ){
 
-    var mMessages = remember { mutableStateListOf<Map<String, Any>>() }
-    var mGroup = remember { mutableMapOf<String, Any>() }
+    val mMessages = remember { mutableStateListOf<Map<String, Any>>() }
+    val mGroup = remember { mutableStateMapOf<String, Any>() }
     val space = LocalSpacing.current
 
     val context = LocalContext.current
 
+    /**Fetches the data for this group - group info and messages to display
+     * */
     fun handleFetchData() {
         CoroutineScope(Dispatchers.IO).launch{
-            val messageResponse = handleApiReqGet("/groups/$groupID", context)
+            val messageResponse = handleApiReqGet("/singleGroup/$groupID", context)
             if (!messageResponse.ok) return@launch
-            mMessages.addAll(elements = messageResponse.content as List<Map<String,Any>>)
 
-            val groupsResponse = handleApiReqGet("/post/groups", context)
-            if (!groupsResponse.ok) return@launch
+            //parsing content from api response
+            val content= messageResponse.content as? Map<*, *> ?: emptyMap<String, Any?>()
+            val group = content["groupInfo"] as? Map<String, Any>?: emptyMap()
+            val messages = content["messages"] as? List<Map<String, Any>>?: listOf(emptyMap())
 
-            val groups = groupsResponse.content as List<Map<String, Any?>>
-            val group = groups.find { it -> it["groupID"] == groupID }
-            mGroup.putAll(group as MutableMap<String, Any>)
+            //only show messages if not empty, and not "empty" array
+            if (messages.isNotEmpty() && messages.toString() != "[{}]") mMessages.addAll(messages)
+            if (group.isNotEmpty()) mGroup.putAll(group)
+        }
+    }
+    /**Handles calling api-handler for updating reply, as well as updating ui when api req is ok.
+     * @param id - String, no default: The id of the message to update
+     * */
+    fun handleUpdateResponse(id : String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            //finding the current message
+            val i = mMessages.indexOfFirst { it -> it["messageID"] == id }
+            if (i == -1) return@launch
+            val message = mMessages[i].toMutableMap()
+
+            //gets current answer: If it currently is "true" then it should be updated to false
+            //if currently not true, e.g. false or null, then it is updated to true
+            val answer = mapOf(
+                "accept" to when(message["userAgreed"]){
+                    true -> false
+                    else -> true
+                }
+            )
+            //making the request to api via api handler function
+            val response = handleApiReqPatch("/groups/$groupID/messages/$id", context, answer)
+            val success = response.ok
+
+            //return if not success
+            if (!success) return@launch
+
+            //update message for ui
+            message["userAgreed"] = when( message["userAgreed"]) {
+                true -> false
+                else -> true
+            }
+            //update item in mutable map for ui to update
+            mMessages[i] = message
         }
     }
 
     handleFetchData()
 
-    fun handleUpdateResponse(id : String) {
-        val success = true
-
-        val i = mMessages.indexOfFirst { it -> it["messageID"] == id }
-        if (i == -1 || !success) return
-
-        val message = mMessages[i].toMutableMap()
-
-        message["userAgreed"] = when( message["userAgreed"]) {
-            true -> false
-            else -> true
-        }
-
-        mMessages[i] = message
-    }
-
-    Layout(
+     Layout(
         navController = navController,
         arrowBack = true,
         showFilter = true,
         pageDetails = {
             MeetupHeader(
-                participants = (mGroup["participants"] as? List<*>)?.size?: 0,
-                helpers = (mGroup["assistingUsers"] as? List<*>)?.size?: 0
-            )},
+                participants = (mGroup["Participants"] as? List<*>)?.size ?: 0,
+                helpers = (mGroup["AssistingUsers"] as? List<*>)?.size ?: 0
+                )
+                  },
         footer = {
             Row( modifier = Modifier.fillMaxWidth())
             {
@@ -96,25 +120,25 @@ fun Meetup(
                         .weight(1f),
                     type = ButtonType.PRIMARY,
                     text = "Make a suggestion",
-                    onClick =  {navController?.navigate("createMeetup")},
+                    onClick =  {navController?.navigate("createMeetup/$groupID")},
             )}},
         content = {
             // Scrollable main content
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = space.s),
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(space.m),
             ) {
 
-                // TODO: Have to use real data
-                mMessages.forEach { post ->
-                    CardMessage(
-                        details = post,
-                        onClick = {
-                            handleUpdateResponse(post["messageID"]?.toString()?: "")
-                        }
-                    )
+                if (mMessages.isNotEmpty()){
+                    mMessages.forEach { message ->
+                        CardMessage(
+                            details = message,
+                            onClick = {
+                                handleUpdateResponse(message["messageID"]?.toString()?: "")
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -150,7 +174,6 @@ fun MeetupHeader(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-
         ) {
     }
         Column(verticalArrangement = Arrangement.spacedBy(space.xs)) {
@@ -173,5 +196,5 @@ fun MeetupHeader(
 @Preview(showBackground = true)
 @Composable
 fun previewMeetup() {
-    Meetup()
+    SingleGroup()
 }
