@@ -213,7 +213,7 @@ func GetMessageByID(messageID string) (models.Message, error) {
 		return models.Message{}, userSnapErr
 	}
 
-	message.GroupID = messageRef.ID
+	message.MessageID = messageRef.ID
 	return message, nil
 }
 

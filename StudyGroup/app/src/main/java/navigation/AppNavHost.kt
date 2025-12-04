@@ -118,7 +118,11 @@ fun AppNavHost(){
         signedInScreen(
             "allMeetups",mIsSignedIn,navController){ AllGroups(navController = navController) }
         signedInScreen(
-            "createMeetup",mIsSignedIn,navController){ CreateMeetup(navController = navController)}
+            "createMeetup/{id}",mIsSignedIn,navController){
+                backStackEntry ->
+            val groupID = backStackEntry.arguments?.getString("id")
+            CreateMeetup(navController = navController, groupID)
+        }
         signedInScreen(
             "createPost",mIsSignedIn,navController){ CreatePost(navController = navController)}
         signedInScreen(
