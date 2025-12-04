@@ -26,7 +26,6 @@ import com.example.studygroup.ui.theme.LocalSpacing
 import components.AppButton
 import components.ButtonType
 import components.TextInput
-import domain.getToken
 import handleApiReqPost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

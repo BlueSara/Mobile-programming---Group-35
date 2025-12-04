@@ -19,7 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
-import domain.removeToken
+import database.removeToken
 
 /**
  * The layout component that holds the top-bar, screen content and footer.

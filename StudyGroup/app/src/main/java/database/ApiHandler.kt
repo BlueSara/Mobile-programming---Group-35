@@ -1,7 +1,7 @@
 import android.content.Context
 import android.util.Log
-import domain.getToken
-import domain.storeToken
+import database.getToken
+import database.storeToken
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
