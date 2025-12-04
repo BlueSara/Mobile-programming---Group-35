@@ -12,7 +12,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
-import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 import components.PageHeadline
 import components.cards.CardSmall
@@ -22,12 +21,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import layout.Layout
-import utils.ConnectivityStatus
 
 
 @Composable
 @Preview(showBackground = true)
-fun AllMeetups(
+fun AllGroups(
     navController: NavHostController ?=null,){
 
     val space = LocalSpacing.current
@@ -52,7 +50,7 @@ fun AllMeetups(
     Layout(
         navController= navController,
         arrowBack = true,
-        pageDetails = { PageHeadline("Schedules overview") },
+        pageDetails = { PageHeadline("Groups overview") },
         content = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(space.m),

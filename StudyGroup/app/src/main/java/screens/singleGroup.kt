@@ -37,7 +37,7 @@ import layout.Layout
  * @param groupID - String, default: null. The id of the current group to get data for
  * */
 @Composable
-fun Meetup(
+fun SingleGroup(
     navController: NavHostController ?=null,
     groupID: String? =null,
     ){
@@ -52,10 +52,7 @@ fun Meetup(
      * */
     fun handleFetchData() {
         CoroutineScope(Dispatchers.IO).launch{
-            //call api handler function to get group info
-            val messageResponse = handleApiReqGet("/groups/$groupID", context)
-            // Return if err
-            //TODO : implement functionality to show pop-up msg to user if any errs occurred
+            val messageResponse = handleApiReqGet("/singleGroup/$groupID", context)
             if (!messageResponse.ok) return@launch
 
             //parsing content from api response
@@ -199,5 +196,5 @@ fun MeetupHeader(
 @Preview(showBackground = true)
 @Composable
 fun previewMeetup() {
-    Meetup()
+    SingleGroup()
 }
