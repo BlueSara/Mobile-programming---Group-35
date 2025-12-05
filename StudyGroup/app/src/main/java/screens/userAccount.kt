@@ -39,6 +39,7 @@ import components.PageHeadline
 import components.PopUp
 import components.TextInput
 import layout.Layout
+import viewModel.addNewSubject
 import java.time.LocalDate
 
 @Composable
@@ -88,6 +89,7 @@ fun UserAccount(
         }
     }
 
+/*
     /**Handling that adding new subjects.
      * Checks that subject name and code is not empty,
      * and that "obligatory" is not null
@@ -104,7 +106,7 @@ fun UserAccount(
         mNewSubject.clear()
         return true
     }
-
+*/
     fun handleUpdateAccount(){
         /*TODO :
            Add logic for some minor front-end validation and calling api.
@@ -460,7 +462,7 @@ fun UserAccount(
                     text="Save and go back",
                     type = ButtonType.PRIMARY,
                     onClick = {
-                        val exitPopUp = addNewSubject()
+                        val exitPopUp = addNewSubject(mNewSubject, { mCurrentSubjects.add(mNewSubject.toMutableMap()) })
                         //does not close pop-up if the new subject could not be added
                         if (exitPopUp) mShowPopUp = false
                     },
@@ -470,7 +472,7 @@ fun UserAccount(
                     text="Add more",
                     type = ButtonType.SUCCESS,
                     onClick = {
-                        addNewSubject()
+                        addNewSubject(mNewSubject, { mCurrentSubjects.add(mNewSubject.toMutableMap()) })
                     },
                     modifier = Modifier.weight(1f)
                 )
