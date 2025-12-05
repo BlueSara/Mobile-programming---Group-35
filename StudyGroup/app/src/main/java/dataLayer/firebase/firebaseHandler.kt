@@ -1,4 +1,4 @@
-package database
+package dataLayer.firebase
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
@@ -17,9 +17,9 @@ class UniversityService {
     private val subjectRef = db.collection("subjects")
 
     /**
-     * Retrieves all universities from the university collection.
+     * Retrieves all universities from the university collection in firestore.
      *
-     * Uses coroutines with .await() to suspend until the query completes.
+     * Uses .await() to suspend until the query finishes.
      * Maps each document to a University object using Firestore’s toObject().
      *
      * @return A list of [University] objects, or an empty list if an error occurs.

@@ -1,4 +1,4 @@
-package database
+package dataLayer.firebase
 
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.PropertyName

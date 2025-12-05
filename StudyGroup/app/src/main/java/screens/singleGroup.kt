@@ -1,6 +1,8 @@
 package screens
 
 import androidx.compose.foundation.background
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -31,6 +35,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import layout.Layout
+import dataLayer.room.Messages
+import dataLayer.room.AppDatabase
+import kotlinx.coroutines.flow.first
+import saveToLocalDb
+
+
+suspend fun fetchMessagesFromLocalDb(groupID: String, context: Context) : List<Messages>?{
+    val db = AppDatabase.getInstance(context)
+    val fetchedMessages = db.messagesDao().getMessagesForGroup(groupID).first()
+    val messages = fetchedMessages
+
+    return messages
+}
 
 /**The screen for viewing a single groups meetup "chat"
  * @param navController - NavHostController, default: null. The navHost controller used to navigate to different screens.
@@ -52,7 +69,7 @@ fun SingleGroup(
      * */
     fun handleFetchData() {
         CoroutineScope(Dispatchers.IO).launch{
-            val messageResponse = handleApiReqGet("/singleGroup/$groupID", context)
+            val messageResponse = handleApiReqGet("/groups/$groupID", context)
             if (!messageResponse.ok) return@launch
 
             //parsing content from api response
@@ -63,6 +80,15 @@ fun SingleGroup(
             //only show messages if not empty, and not "empty" array
             if (messages.isNotEmpty() && messages.toString() != "[{}]") mMessages.addAll(messages)
             if (group.isNotEmpty()) mGroup.putAll(group)
+
+            //only show messages if not empty, and not "empty" array
+            if (messages.isNotEmpty() && messages.toString() != "[{}]") {
+                mMessages.addAll(messages)
+            }
+            if (group.isNotEmpty()) {
+                mGroup.putAll(group)
+            }
+
         }
     }
     /**Handles calling api-handler for updating reply, as well as updating ui when api req is ok.
@@ -99,8 +125,31 @@ fun SingleGroup(
             mMessages[i] = message
         }
     }
+    //calling handler to fetch contents to display in screen
+    LaunchedEffect(Unit) {
+        handleFetchData()
 
-    handleFetchData()
+        if (groupID.isNullOrEmpty()) return@LaunchedEffect
+        val messages = fetchMessagesFromLocalDb(groupID, context)
+        Log.i("MESSAGES", "$messages")
+    }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { mMessages.toList() }
+            .collect { messages ->
+                if (messages.isEmpty()) return@collect
+                if (groupID.isNullOrEmpty()) return@collect
+                saveToLocalDb(
+                    context,
+                    groupID,
+                    mGroup,
+                    mMessages,
+                    participants = (mGroup["Participants"] as? List<*>)?.size ?: 0,
+                    helpers  = (mGroup["AssistingUsers"] as? List<*>)?.size ?: 0
+                )
+
+            }
+    }
 
      Layout(
         navController = navController,
@@ -193,8 +242,10 @@ fun MeetupHeader(
 }
 
 
+
 @Preview(showBackground = true)
 @Composable
 fun previewMeetup() {
     SingleGroup()
 }
+

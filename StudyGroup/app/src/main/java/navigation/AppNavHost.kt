@@ -19,7 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import database.getToken
+import dataLayer.api.getToken
 import screens.AllGroups
 import screens.CreateMeetup
 import screens.CreatePost
