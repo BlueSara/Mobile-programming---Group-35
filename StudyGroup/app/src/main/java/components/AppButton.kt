@@ -26,6 +26,9 @@ import com.example.studygroup.ui.theme.LocalCustomColors
 import com.example.studygroup.ui.theme.LocalSpacing
 
 
+/**
+ * Button types that represents the visual style of the AppButton
+ */
 enum class ButtonType {
     PRIMARY,
     PRIMARYACTIVE,
@@ -36,6 +39,17 @@ enum class ButtonType {
     INFO,
     INFOACTIVE
 }
+
+/**
+ * Custom button used throughout the application, typically a "Cancel" or "Done" button or the like.
+ *
+ * @param modifier Optional layout modifier
+ * @param type Determines the visual style of the button
+ * @param onClick Callback invoked when the button is pressed
+ * @param text Text to display inside the button
+ * @param shape Corner shape of the button
+ * @param width Width of the button
+ */
 @Composable
 fun AppButton(
     modifier: Modifier = Modifier,
@@ -129,13 +143,13 @@ fun AppButton(
         )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewAppButton() {
     val space = LocalSpacing.current
     Column (
         verticalArrangement = Arrangement.spacedBy(space = space.xs)
-
     ){
         Row(
             horizontalArrangement = Arrangement.spacedBy(space.xs)
