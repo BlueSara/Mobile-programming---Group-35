@@ -106,7 +106,7 @@ fun CreatePost(
                 "title" to mTopic,
                 "subjectID" to mSelectedSubject,
                 "subject" to mSelectedSubjectName,
-                "topic" to mTopic,
+                "topic" to mDescription,
                 "useProximity" to mUseLocation,
                 "expirationDate" to formattedDate
             )
@@ -217,6 +217,7 @@ fun CreatePost(
 
                 TextArea(
                     value = mDescription,
+                    onChange = { mDescription = it},
                     label = "Description"
                 )
 
