@@ -36,6 +36,8 @@ data class Subject(
     val studyPrograms: List<StudyProgramLink>? = null,
 
     val posts: List<String>? = null,
+
+    var firestoreID: String? = null
 )
 
 

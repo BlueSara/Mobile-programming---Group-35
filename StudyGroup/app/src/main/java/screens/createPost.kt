@@ -41,8 +41,18 @@ import components.DateInput
 import components.PageHeadline
 import components.Select
 import components.TextArea
+import components.TextInput
+import dataLayer.firebase.UniversityService
+import handleApiReqGet
+import handleApiReqPost
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import layout.Layout
 import java.time.LocalDate
+import dataLayer.firebase.Subject
+
 
 
 val mockUpSubjects:List<Map<String,String>> =  listOf(
@@ -62,27 +72,72 @@ val mockUpSubjects:List<Map<String,String>> =  listOf(
         Pair("even_more_data", "no way")
     ),
 )
-
+// API_DEBUG_BODY API_DEBUG_BODY CREATE_POST
 @Composable
 fun CreatePost(
     navController: NavHostController ?=null,) {
-    val availableSubjects = mockUpSubjects // TODO: USE REAL DATA
-    var mSelectedSubject by remember { mutableStateOf("") }
-    var mTopic by remember { mutableStateOf("") }
-    var mExpirationDate by remember { mutableStateOf(LocalDate.now()) }
-    var mUseLocation by remember { mutableStateOf(false) }
-
     val space = LocalSpacing.current
-    val permission = Manifest.permission.ACCESS_FINE_LOCATION
+    val context = LocalContext.current
 
-    fun handlePushingPost(){
-        //TODO : ADD LOGIC TO VALIDATE AND PUBLISH POST (API)
+    val universityService = remember { UniversityService() }
+    var subjects by remember { mutableStateOf(listOf<Subject>()) }
+
+    LaunchedEffect(Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = universityService.getAllSubjects()
+            subjects = result
+        }
     }
 
+    var mSelectedSubject by remember { mutableStateOf("") }
+    var mSelectedSubjectName by remember { mutableStateOf("") }
+    var mTopic by remember { mutableStateOf("") }
+    var mDescription by remember {mutableStateOf("")}
+    var mExpirationDate by remember { mutableStateOf(LocalDate.now()) }
+    var mUseLocation by remember { mutableStateOf(false) }
     var mLat by remember { mutableDoubleStateOf(0.0) }
     var mLng by remember { mutableDoubleStateOf(0.0) }
 
-    val context = LocalContext.current
+    val permission = Manifest.permission.ACCESS_FINE_LOCATION
+    fun handlePushingPost(){
+        CoroutineScope(Dispatchers.IO).launch {
+            val formattedDate = "${mExpirationDate}T00:00:00Z"
+            val body = mutableMapOf<String, Any>(
+                "title" to mTopic,
+                "subjectID" to mSelectedSubject,
+                "subject" to mSelectedSubjectName,
+                "topic" to mTopic,
+                "useProximity" to mUseLocation,
+                "expirationDate" to formattedDate
+            )
+
+            if (mUseLocation) {
+                body["xCoord"] = mLat
+                body["yCoord"] = mLng
+
+            }
+
+            Log.e("POST_BODY", "ERROR: $body")
+
+            val newPost = handleApiReqPost("/post/create", body as Map<String, Any>?, context )
+
+            if (newPost.ok) {
+                Log.d("CREATE_POST", "OK: ${newPost.code}, ${newPost.content}")
+                withContext(Dispatchers.Main) {
+                    navController?.navigate("home")
+                }
+                } else {
+                Log.e("CREATE_POST", """
+                POST FAILED
+                Status code: ${newPost.code}
+                Response ok?: ${newPost.ok}
+                Raw content: ${newPost.content}
+                """.trimIndent())
+
+            }
+        }
+    }
+
     val activity = context as? ComponentActivity
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -143,13 +198,27 @@ fun CreatePost(
             ) {
                 Text("Subject", fontSize = 20.sp)
                 Select(
-                    onChange = { mSelectedSubject = it },
-                    options = availableSubjects
+                    onChange = { selectedId ->
+                        mSelectedSubject = selectedId
+                        val obj = subjects.find { it.firestoreID == selectedId }
+                        mSelectedSubjectName = obj?.name ?: ""
+                    },
+                    options = subjects.map { subject ->
+                        mapOf(
+                            "id" to (subject.firestoreID ?: ""),
+                            "name" to ("${subject.code} - ${subject.name}")
+                        )
+                    }
                 )
-                TextArea(
+                TextInput(
                     value = mTopic,
                     onChange = { mTopic = it },
                     label = "Assignment/topic")
+
+                TextArea(
+                    value = mDescription,
+                    label = "Description"
+                )
 
                 DateInput(
                     date = mExpirationDate,
