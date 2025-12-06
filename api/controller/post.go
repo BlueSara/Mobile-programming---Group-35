@@ -230,7 +230,7 @@ func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, post
 	}
 
 	for _, resp := range post.Responses {
-		if &resp.UserID != &token.UserID && resp.Response != "skip" {
+		if resp.UserID != token.UserID && resp.Response != "skip" {
 			response.Error(http.StatusConflict, "Cannot update this post as others have already responded to it", w)
 			return
 		}

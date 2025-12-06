@@ -103,10 +103,10 @@ fun CreatePost(
         CoroutineScope(Dispatchers.IO).launch {
             val formattedDate = "${mExpirationDate}T00:00:00Z"
             val body = mutableMapOf<String, Any>(
-                "title" to mTopic,
+                "title" to mDescription,
                 "subjectID" to mSelectedSubject,
                 "subject" to mSelectedSubjectName,
-                "topic" to mDescription,
+                "topic" to mTopic,
                 "useProximity" to mUseLocation,
                 "expirationDate" to formattedDate
             )
