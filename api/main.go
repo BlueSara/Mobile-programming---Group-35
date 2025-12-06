@@ -15,6 +15,7 @@ func main() {
 		router usage example:
 		routes.Register("/test/:testID/path", "GET", handler.SomeHandler)
 	*/
+
 	if os.Getenv("RENDER") == "" {
 		godotenv.Load()
 	}
@@ -31,16 +32,23 @@ func main() {
 	routes.Register("groups/:groupID", "POST", handler.CreateMeetupSuggestion)
 	routes.Register("groups/:groupID/messages/:messageID", "PATCH", handler.AnswerMeetupSuggestion)
 	routes.Register("/groups/:groupID", "GET", handler.GetSingleGroupData) // row 17
-	routes.Register("/posts/replied", "GET", handler.GetRepliedPosts)      // row 14
+	routes.Register("/posts/replied", "GET", handler.GetRepliedPosts)
+	routes.Register("/posts/own", "GET", handler.GetOwnPosts)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
 
+	urlAndPort := port
+
+	if os.Getenv("RENDER") == "" {
+		urlAndPort = "127.0.0.1:" + port
+	}
+
 	fmt.Println("Server running on port", port)
 
-	http.ListenAndServe(port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.ListenAndServe(urlAndPort, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		routes.Router(r.URL.Path, r.Method, r, w)
 	}))
 }

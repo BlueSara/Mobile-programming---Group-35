@@ -66,16 +66,20 @@ class UniversityService {
      */
     suspend fun getAllSubjects(): List<Subject> {
         return try {
-            subjectRef
-                .get()      // Firestore query
-                .await()
-                .documents
-                .mapNotNull { it.toObject<Subject>() }  // Parse to data class
-        } catch (e: Exception) {    // Error handling if there is nothing to retrieve
+            val snapshot = subjectRef.get().await()
+
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject<Subject>()?.apply {
+                    firestoreID = doc.id   // <-- SETTES HER
+                }
+            }
+
+        } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
         }
     }
+
 
 
     /**
