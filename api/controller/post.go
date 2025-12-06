@@ -204,6 +204,23 @@ func UpdateAnswer(r *http.Request, w http.ResponseWriter, token *structs.Token, 
 	response.Message(http.StatusOK, "Answer updated!", w)
 }
 
+func GetOwnPosts(r *http.Request, w http.ResponseWriter, token *structs.Token) {
+	allPosts, postsErr := services.GetAllPosts()
+	if postsErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
+	}
+	var posts []models.Post
+	for _, p := range allPosts {
+		if *p.UserID == token.UserID {
+			posts = append(posts, p)
+		}
+	}
+
+	response.Object(http.StatusOK, posts, w)
+
+}
+
 // GetAllPosts returns all posts the authenticated user has not yet responded to.
 func EditPost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID string, newPostData structs.Post) {
 	post, getErr := services.GetPostByID(postID)
