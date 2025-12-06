@@ -2,8 +2,10 @@ package components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,11 +37,6 @@ fun PageHeadline(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = colors.borderColor,
-                shape = RectangleShape
-            )
             .background(colors.background)
             .padding(top = space.l, bottom = space.m, )
             .then(
@@ -69,5 +66,11 @@ fun PageHeadline(
 @Preview(showBackground = true)
 @Composable
 fun PreviewPageHeadLine(){
-    PageHeadline(text = "Headline title")
+    Box(
+        modifier = Modifier
+            .height(100.dp)
+            .padding(horizontal = 5.dp, vertical = 5.dp)
+    ){
+        PageHeadline(text = "Headline title")
+    }
 }
