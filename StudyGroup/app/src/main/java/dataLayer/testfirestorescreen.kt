@@ -1,13 +1,15 @@
-package database
+package dataLayer
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.google.firebase.firestore.toObject
+import dataLayer.firebase.StudyProgram
+import dataLayer.firebase.Subject
+import dataLayer.firebase.University
+import dataLayer.firebase.UniversityService
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 
 @OptIn(ExperimentalMaterial3Api::class)

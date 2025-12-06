@@ -1,4 +1,4 @@
-package domain
+package dataLayer.api
 
 import android.content.Context
 import android.content.SharedPreferences
