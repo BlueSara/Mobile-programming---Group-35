@@ -81,15 +81,28 @@ fun handleUpdatePost(
     if (postID == null) return false
     val formattedDate = "${exp}T00:00:00Z"
 
+    val xCoordinate = when (useLocation){
+        false -> 0.00
+        else -> xCoord ?: 0.00
+    }
+
+    val yCoordinate = when (useLocation){
+        false -> 0.00
+        else -> yCoord ?: 0.00
+    }
+
     val body: Map<String, Any> = mapOf(
-        "title" to topic,
+        "title" to description,
         "subjectID" to subject,
-        "topic" to description,
+        "topic" to topic,
         "useProximity" to useLocation,
         "expirationDate" to formattedDate,
-        "xCoord" to xCoord,
-        "yCoord" to yCoord
+        "xCoord" to xCoordinate,
+        "yCoord" to yCoordinate
     ) as Map<String, Any>
+
+    Log.i("API-REQUEST-LOG-POST", body.toString())
+
     val res = handleApiReqPut("/posts/$postID", context, body)
     return res.ok
 }

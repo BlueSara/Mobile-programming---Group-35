@@ -224,7 +224,7 @@ fun EditPost(
                 PopUp(title="Oh oh..",
                     onDismiss = {mShowErr = false}) {
                     Text(
-                        text="Someone messed up and now you're suffering the consequences..",
+                        text="Either people have already responded to this post so you cannot update it, or someone messed up and now you're suffering the consequences..",
                         fontSize = 20.sp
                     )
                 }
@@ -239,7 +239,7 @@ fun EditPost(
                 AppButton(
                     modifier = Modifier.weight(1f),
                     text = "Cancel",
-                    onClick = { navController?.navigate("home") },
+                    onClick = { navController?.navigate("userPost") },
                     type = ButtonType.DANGER
                 )
                 AppButton(
