@@ -8,16 +8,16 @@
       <SelectionState runConfigName="TextInputTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="maxLength_preventsOverflow()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="counterUpdatesCorrectly()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="focus_callsOnFocusAndBlur()">
+      <SelectionState runConfigName="counterUpdatesCorectly()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="counterUpdatesCorectly()">
+      <SelectionState runConfigName="DropDownInstrumentedTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="dropDown_selectsOption_andDismisses()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
