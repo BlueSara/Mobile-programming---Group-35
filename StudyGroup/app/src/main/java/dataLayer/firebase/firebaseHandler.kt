@@ -67,13 +67,11 @@ class UniversityService {
     suspend fun getAllSubjects(): List<Subject> {
         return try {
             val snapshot = subjectRef.get().await()
-
             snapshot.documents.mapNotNull { doc ->
                 doc.toObject<Subject>()?.apply {
-                    firestoreID = doc.id   // <-- SETTES HER
+                    firestoreID = doc.id   //
                 }
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()

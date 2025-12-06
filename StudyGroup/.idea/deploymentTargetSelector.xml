@@ -5,13 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="UserReplies">
+      <SelectionState runConfigName="TextInputTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Home">
+      <SelectionState runConfigName="counterUpdatesCorrectly()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="CreatePost">
+      <SelectionState runConfigName="counterUpdatesCorectly()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DropDownInstrumentedTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="dropDown_selectsOption_andDismisses()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
