@@ -125,7 +125,11 @@ fun AppNavHost(){
         signedInScreen(
             "createPost",mIsSignedIn,navController){ CreatePost(navController = navController)}
         signedInScreen(
-            "editPost",mIsSignedIn,navController){ EditPost(navController = navController)}
+            "editPost/{id}",mIsSignedIn,navController
+        ) { backStackEntry ->
+            val postID = backStackEntry.arguments?.getString("id")
+            EditPost(navController, postID)
+        }
         signedInScreen(
             "meetup/{id}",mIsSignedIn,navController){
             backStackEntry ->

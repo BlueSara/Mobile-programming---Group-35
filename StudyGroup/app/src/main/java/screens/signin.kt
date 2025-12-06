@@ -103,7 +103,7 @@ fun SignIn(
                 onChange = {it -> mPassword = it}
             )
             Text(
-                text="Already have an account? Sign in here!",
+                text="Dont have an account? Sign in here!",
                 color = colors.primaryActive,
                 textDecoration = TextDecoration.Underline,
                 fontSize = 18.sp,
