@@ -34,6 +34,7 @@ func main() {
 	routes.Register("/groups/:groupID", "GET", handler.GetSingleGroupData) // row 17
 	routes.Register("/posts/replied", "GET", handler.GetRepliedPosts)
 	routes.Register("/posts/own", "GET", handler.GetOwnPosts)
+	routes.Register("/posts/own/:postID", "GET", handler.GetsinglePost)
 
 	port := os.Getenv("PORT")
 	if port == "" {

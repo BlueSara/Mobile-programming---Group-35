@@ -76,6 +76,23 @@ func AnswerPost(r *http.Request, w http.ResponseWriter, params map[string]string
 	controller.AnswerPost(r, w, &token, postID, answer)
 }
 
+func GetsinglePost(r *http.Request, w http.ResponseWriter, params map[string]string) {
+	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
+		response.Error(http.StatusTooManyRequests, "Too many requests", w)
+		return
+	}
+
+	postID := params["postID"]
+	token, tokenErr := auth.IsUserAuth(r)
+	if tokenErr != nil {
+		response.Error(http.StatusUnauthorized, "Unauthorized access", w)
+		return
+	}
+
+	controller.GetsinglePost(r, w, &token, postID)
+
+}
+
 func GetOwnPosts(r *http.Request, w http.ResponseWriter, params map[string]string) {
 	if limiter := ratelimiting.RateLimiter(); !limiter.Allow() {
 		response.Error(http.StatusTooManyRequests, "Too many requests", w)
