@@ -7,6 +7,7 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.collections.emptyMap
+import kotlin.reflect.typeOf
 
 /**Formats the api response so all content is necessary
  * @property content - Any, nullable, the json content parsed into map, or list with mapsr
@@ -52,9 +53,12 @@ fun JSONObject.toMap() : Map<String, Any?> = keys().asSequence().associateWith {
 fun formatResponse(connection: HttpURLConnection): ApiResponse {
     val code = connection.responseCode
     val ok = connection.responseCode in 200..299
+    var jsonContent: Any = emptyMap<String, Any>()
+
     val unparsedContent = connection.inputStream.bufferedReader().readText()
 
-    var jsonContent: Any = emptyMap<String, Any>()
+    // and returning if the trimmed (due to potential new-line) string is "null"
+    if (unparsedContent.trim() == "null") return ApiResponse(null, code, ok)
 
     if (code != 204){
         jsonContent = try {
@@ -96,7 +100,6 @@ fun handleApiReqGet(path: String, context: Context): ApiResponse{
     return try{
         val response = formatResponse(connection)
         connection.disconnect()
-
         response
 
     }catch(e : Exception){

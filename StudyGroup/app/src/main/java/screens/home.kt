@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -27,6 +28,7 @@ import com.example.studygroup.ui.theme.LocalSpacing
 import components.AppButton
 import components.ButtonType
 import components.PageHeadline
+import components.PopUp
 import components.cards.CardLarge
 import handleApiReqGet
 import handleApiReqPatch
@@ -35,6 +37,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import layout.Layout
+import org.jetbrains.annotations.Async
+import viewModel.fetchPosts
+import viewModel.respondToPost
 import java.util.Timer
 import kotlin.concurrent.schedule
 
@@ -54,17 +59,18 @@ fun Home(
     //boolean for handling if post should be displayed or not.
     //for when answering a post, to have small gap between current and next post.
     var postIsChanging by remember { mutableStateOf(false) }
+    var mShowErr by remember { mutableStateOf(false) }
 
     //holding all fetched posts, currently using mockup data
     val allPosts = remember { mutableStateListOf<Map<String, Any>>() }
 
-    /** Used to call api in order to fetch more posts.
-     * Needs to use signInToken when calling api.
-     * */
-    fun fetchPosts(){
-        CoroutineScope(Dispatchers.IO).launch{
-            val response = handleApiReqGet("/posts", context)
-            if (!response.ok) return@launch
+    //fetching posts when screen is initially loaded
+    LaunchedEffect(Unit) {
+        val response = withContext(Dispatchers.IO){
+            fetchPosts(context)
+        }
+        mShowErr = !response.ok
+        if (response.ok){
             allPosts.addAll(elements = response.content as List<Map<String,Any>>)
         }
     }
@@ -77,10 +83,16 @@ fun Home(
         allPosts.removeAt(0)
 
         //fetching new posts if no posts are left in mutable list
-        if (allPosts.firstOrNull() == null) fetchPosts()
+        if (allPosts.firstOrNull() == null) {
+            val response =  fetchPosts(context)
+            mShowErr = !response.ok
+            if (response.ok){
+                allPosts.addAll(elements = response.content as List<Map<String,Any>>)
+            }
+        }
 
         //timeout to visually show that the post changes
-        Timer().schedule(500){
+        Timer().schedule(300){
             //returning to false so next post is displayed again
             postIsChanging = false
         }
@@ -92,18 +104,14 @@ fun Home(
     fun handleReply(reply: String ?=null){
         //returning so user cannot do actions when no posts are available
         if (allPosts.firstOrNull() == null) return
-
         val currentPost = allPosts[0].toMap()
-        val postID = currentPost["postID"]
-        if (postID == "") return
-
-        val body = mapOf("answer" to reply)
 
         CoroutineScope(Dispatchers.IO).launch {
-            val response = handleApiReqPatch(
-                path= "/post/${postID}/answer",
-                context= context,
-                body= body as Map<String, Any>?
+            Log.i("CURRENT-POST", "$currentPost")
+            val response = respondToPost(
+                context,
+                reply?: "",
+                currentPost["postID"].toString()
             )
 
             if (!response.ok) return@launch
@@ -111,8 +119,6 @@ fun Home(
                 updateList()
             }
         }
-
-        //insert logic for calling api to answer post here
     }
 
 
@@ -157,10 +163,6 @@ fun Home(
         }
     }
 
-
-    //fetching posts when screen is initially loaded
-    fetchPosts()
-
     Layout(
         navController= navController,
         pageDetails = { PageHeadline(text="Home") },
@@ -178,6 +180,19 @@ fun Home(
                     Text(
                         text="You have answered all posts! Good job!",
                         fontSize = 18.sp)
+                }
+            }
+            if (mShowErr){
+                PopUp(
+                    title = "Oh ooh..",
+                    onDismiss = {mShowErr = false}
+                ) {
+                    Text(
+                        fontSize = 20.sp,
+                        text = "ah.. someone messed up, and now " +
+                                "you are suffering the consequences. " +
+                                "Sorry bout that.."
+                    )
                 }
             }
         },
