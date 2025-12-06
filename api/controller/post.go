@@ -43,6 +43,21 @@ func CreatePost(r *http.Request, w http.ResponseWriter, token *structs.Token, po
 	response.Object(http.StatusOK, post, w)
 }
 
+func GetsinglePost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID string) {
+	post, postErr := services.GetPostByID(postID)
+	if postErr != nil {
+		response.Error(http.StatusInternalServerError, "Internal server error", w)
+		return
+	}
+
+	if *post.UserID != token.UserID {
+		response.Error(http.StatusForbidden, "Not your post", w)
+		return
+	}
+
+	response.Object(http.StatusOK, post, w)
+}
+
 func AnswerPost(r *http.Request, w http.ResponseWriter, token *structs.Token, postID, answer string) {
 	user, userErr := services.FindUserByID(token.UserID)
 	if userErr != nil {
