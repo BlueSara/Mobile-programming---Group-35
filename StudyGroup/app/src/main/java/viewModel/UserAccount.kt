@@ -6,6 +6,9 @@ package viewModel
  * Handling that adding new subjects.
  * Checks that subject name and code is not empty,
  * and that "obligatory" is not null
+ * @param newSubject New subject to be added
+ * @param onSuccess Function that will be invoked if [newSubject] is valid. Usually a setter
+ *                  for mutable states
  * @return Boolean - Returns boolean regarding whether the new subject could be added or not.
  * */
 fun addNewSubject(
