@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,11 +29,11 @@ import components.AppButton
 import components.ButtonType
 import components.DateInput
 import components.PageHeadline
+import components.PopUp
 import components.Select
 import components.TextArea
 import components.TextInput
 import handleApiReqGet
-import handleApiReqPost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,8 +42,8 @@ import layout.Layout
 import java.time.LocalDate
 import dataLayer.firebase.UniversityService
 import dataLayer.firebase.Subject
-import handleApiReqDelete
-import handleApiReqPut
+import viewModel.handleDeletePost
+import viewModel.handleUpdatePost
 
 @Composable
 fun EditPost(
@@ -57,12 +56,13 @@ fun EditPost(
     // post data from the  API
     var postData by remember { mutableStateOf<Map<String, Any>?>(null) }
 
-    // Subjects from Firestorehandler
+    // Subjects from Firestore handler
     val universityService = remember { UniversityService() }
     var subjects by remember { mutableStateOf(listOf<Subject>()) }
 
     var mSelectedSubject by remember { mutableStateOf("") }
     var mSelectedSubjectName by remember { mutableStateOf("") }
+    var mShowErr by remember { mutableStateOf(false) }
     var mTopic by remember { mutableStateOf("") }
     var mDescription by remember { mutableStateOf("") }
     var mExpirationDate by remember { mutableStateOf(LocalDate.now()) }
@@ -107,46 +107,37 @@ fun EditPost(
         }
     }
 
-    fun handleUpdatePost() {
-        if (postID == null) return
-
-        val formattedDate = "${mExpirationDate}T00:00:00Z"
-
-        val body = mapOf(
-            "title" to mTopic,
-            "subjectID" to mSelectedSubject,   // firestoreID
-            "topic" to mDescription,
-            "useProximity" to mUseLocation,
-            "expirationDate" to formattedDate
-        )
-
+    fun updatePost() {
         CoroutineScope(Dispatchers.IO).launch {
-            val res = handleApiReqPut("/posts/$postID", context, body)
-
-            if (res.ok) {
-                Log.d("EDIT_POST", "Updated successfully")
-                withContext(Dispatchers.Main) {
-                    navController?.navigate("userPost")
-                }
-            } else {
-                Log.e("EDIT_POST", "Update FAILED: ${res.code} | ${res.content}")
+            val success = handleUpdatePost(
+                postID = postID,
+                exp = mExpirationDate,
+                topic = mTopic,
+                subject = mSelectedSubject,
+                description = mDescription,
+                useLocation = mUseLocation,
+                context = context
+                // TODO : add coordinates
+            )
+            if (!success) {
+                mShowErr = true
+                return@launch
+            }
+            withContext(Dispatchers.Main) {
+                navController?.navigate("userPost")
             }
         }
     }
 
-    fun handleDeletePost() {
-       if (postID == null) return
-
+    /**Handles deletion of post*/
+    fun deletePost() {
        CoroutineScope(Dispatchers.IO).launch {
-           val res = handleApiReqDelete("/post/$postID", context)
-
-           if (res.ok) {
-               Log.d("EDIT_POST", "Delete successfull!")
+           val success = handleDeletePost(postID, context)
+           if (!success) mShowErr = true
+           else {
                withContext(Dispatchers.Main) {
                    navController?.navigate("userPost")
                }
-           } else {
-               Log.e("EDIT_POST", "DELETE FAIL :( ${res.code} | ${res.content}")
            }
        }
     }
@@ -224,7 +215,17 @@ fun EditPost(
                         modifier = Modifier.fillMaxWidth(),
                         text = "Delete post",
                         type = ButtonType.DANGER,
-                        onClick = { handleDeletePost() }
+                        onClick = { deletePost() }
+                    )
+                }
+            }
+
+            if (mShowErr){
+                PopUp(title="Oh oh..",
+                    onDismiss = {mShowErr = false}) {
+                    Text(
+                        text="Someone messed up and now you're suffering the consequences..",
+                        fontSize = 20.sp
                     )
                 }
             }
@@ -244,7 +245,7 @@ fun EditPost(
                 AppButton(
                     modifier = Modifier.weight(1f),
                     text = "Publish",
-                    onClick = { handleUpdatePost() }
+                    onClick = { updatePost() }
                 )
             }
         }
