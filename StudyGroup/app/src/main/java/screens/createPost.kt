@@ -55,24 +55,6 @@ import dataLayer.firebase.Subject
 
 
 
-val mockUpSubjects:List<Map<String,String>> =  listOf(
-    mapOf(
-        Pair("id", "1234"),
-        Pair("more_data", "what"),
-        Pair("name", "NTNU")
-    ),
-    mapOf(
-        Pair("name", "Oslo Met"),
-        Pair("id", "67")
-    ),
-    mapOf(
-        Pair("name", "Høyskolen Kristiania"),
-        Pair("id", "9876"),
-        Pair("more_data", "omg"),
-        Pair("even_more_data", "no way")
-    ),
-)
-// API_DEBUG_BODY API_DEBUG_BODY CREATE_POST
 @Composable
 fun CreatePost(
     navController: NavHostController ?=null,) {
@@ -103,7 +85,7 @@ fun CreatePost(
         CoroutineScope(Dispatchers.IO).launch {
             val formattedDate = "${mExpirationDate}T00:00:00Z"
             val body = mutableMapOf<String, Any>(
-                "title" to mTopic,
+                "title" to mDescription,
                 "subjectID" to mSelectedSubject,
                 "subject" to mSelectedSubjectName,
                 "topic" to mTopic,
@@ -217,6 +199,7 @@ fun CreatePost(
 
                 TextArea(
                     value = mDescription,
+                    onChange = { mDescription = it},
                     label = "Description"
                 )
 
@@ -231,7 +214,6 @@ fun CreatePost(
                     horizontalArrangement = Arrangement.spacedBy(space.s),
                     modifier = Modifier
                         .fillMaxWidth()
-                        // make entire row clickable so users may tap the label
                         .clickable(
                             onClick = { mUseLocation = !mUseLocation },
                             role = Role.Checkbox
@@ -249,7 +231,7 @@ fun CreatePost(
                                     == PackageManager.PERMISSION_GRANTED
                                 ) {
 
-                                    // Already granted, just fetch location
+
                                     activity?.let { act ->
                                         val client =
                                             LocationServices.getFusedLocationProviderClient(act)
@@ -267,7 +249,6 @@ fun CreatePost(
                                         }
                                     }
                                 } else {
-                                    // Trigger permission prompt manually
                                     permissionLauncher.launch(permission)
                                 }
                             } else {
