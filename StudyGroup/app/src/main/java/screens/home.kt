@@ -5,7 +5,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
@@ -13,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.rotationMatrix
 import androidx.navigation.NavHostController
 import com.example.studygroup.ui.theme.LocalSpacing
 import components.AppButton
@@ -30,14 +27,11 @@ import components.ButtonType
 import components.PageHeadline
 import components.PopUp
 import components.cards.CardLarge
-import handleApiReqGet
-import handleApiReqPatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import layout.Layout
-import org.jetbrains.annotations.Async
 import viewModel.fetchPosts
 import viewModel.respondToPost
 import java.util.Timer
@@ -107,7 +101,6 @@ fun Home(
         val currentPost = allPosts[0].toMap()
 
         CoroutineScope(Dispatchers.IO).launch {
-            Log.i("CURRENT-POST", "$currentPost")
             val response = respondToPost(
                 context,
                 reply?: "",
@@ -120,7 +113,6 @@ fun Home(
             }
         }
     }
-
 
     val sensorManager = remember {
         context.getSystemService(SENSOR_SERVICE) as SensorManager
