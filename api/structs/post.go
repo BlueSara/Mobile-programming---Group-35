@@ -13,7 +13,7 @@ type FetchPost struct {
 type Post struct {
 	Title          string    `json:"title" validate:"min=5,max=200,required"`
 	SubjectID      string    `json:"subjectID" validate:"len=20,required"`
-	Topic          string    `json:"topic" validate:"min=4,max=30"`
+	Topic          string    `json:"topic" validate:"min=4"`
 	UseProximity   bool      `json:"useProximity"`
 	ExpidationDate time.Time `json:"expirationDate" validate:"required"`
 	XCoord         float64   `json:"xCoord"`
