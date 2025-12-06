@@ -1,7 +1,7 @@
 import android.content.Context
 import android.util.Log
-import domain.getToken
-import domain.storeToken
+import dataLayer.api.getToken
+import dataLayer.api.storeToken
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -79,6 +79,7 @@ fun formatRequest(connection: HttpURLConnection, method: String, token: String ?
     connection.connectTimeout = 60000
     connection.readTimeout = 60000
     connection.setRequestProperty("Accept", "application/json")
+    //connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8")
 }
 
 /**This is used for making GET-requests to the api
